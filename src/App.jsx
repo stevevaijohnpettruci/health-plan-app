@@ -11,9 +11,9 @@ import { Notifikasi } from './pages/Notifikasi'
 import { Register } from './pages/Register'
 import { Login } from './pages/Login'
 import { BasicIdentity } from './pages/BasicIdentity'
-import { LifestyleAssessment } from './pages/LifestyleAssessment'
 import { HealthSecurity } from './pages/HealthSecurity'
 import { GoalSetting } from './pages/GoalSetting'
+import { Lifestyle } from './pages/Lifestyle'
 import { useAuth } from './hooks/useAuth'
 
 function AppRoutes() {
@@ -46,7 +46,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/onboarding/basic-identity" element={<BasicIdentity />} />
-        <Route path="/onboarding/lifestyle" element={<LifestyleAssessment />} />
+        <Route path="/onboarding/lifestyle" element={<Lifestyle />} />
         <Route path="/onboarding/health-security" element={<HealthSecurity />} />
         <Route path="/onboarding/goal-setting" element={<GoalSetting />} />
         <Route path="*" element={<Navigate to="/onboarding/basic-identity" replace />} />

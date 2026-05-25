@@ -17,6 +17,17 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(savedUser))
       setIsAuthenticated(true)
     }
+    // determine onboarding step from saved profile
+    try {
+      const profile = JSON.parse(localStorage.getItem('healthplan_profile') || '{}')
+      const required = ['age', 'weight', 'height', 'activityLevel']
+      const missing = required.some(k => profile[k] === undefined || profile[k] === null || profile[k] === '')
+      if (savedUser && authToken) {
+        setOnboardingStep(missing ? 'basic-identity' : (profile._onboardingComplete ? 'complete' : null))
+      }
+    } catch (e) {
+      // ignore parse errors
+    }
     setLoading(false)
   }, [])
 
@@ -44,6 +55,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('healthplan_auth', 'token_' + Date.now())
         setUser(parsed)
         setIsAuthenticated(true)
+        // set onboarding step based on profile completeness
+        try {
+          const profile = JSON.parse(localStorage.getItem('healthplan_profile') || '{}')
+          const required = ['age', 'weight', 'height', 'activityLevel']
+          const missing = required.some(k => profile[k] === undefined || profile[k] === null || profile[k] === '')
+          setOnboardingStep(missing ? 'basic-identity' : (profile._onboardingComplete ? 'complete' : null))
+        } catch (e) {}
         return true
       }
     }

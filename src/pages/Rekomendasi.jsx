@@ -14,7 +14,7 @@ export const Rekomendasi = () => {
   }
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 page-inner">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">AI Recommendations</h1>
@@ -22,15 +22,12 @@ export const Rekomendasi = () => {
       </div>
 
       {/* AI Generated Alert */}
-      <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-8">
-        <div className="flex items-start gap-4">
-          <span className="text-3xl">▶️</span>
-          <div>
-            <h3 className="text-lg font-semibold mb-1">Daily recommendations updated</h3>
-            <p className="text-gray-400 text-sm">Last updated: today, 06:00 — Model v2.1</p>
-          </div>
-          <button className="ml-auto btn-primary">Refresh</button>
+      <div className="top-banner mb-8">
+        <div>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Daily recommendations updated</h3>
+          <p style={{ margin: 0, opacity: .9, fontSize: '.9rem' }}>Last updated: today, 06:00 — Model v2.1</p>
         </div>
+        <button className="cta">Refresh</button>
       </div>
 
       {/* Tabs */}
@@ -53,11 +50,12 @@ export const Rekomendasi = () => {
       {/* Recommendations Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {recommendations.slice(0, 3).map(rec => (
-          <RecommendationCard
-            key={rec.id}
-            recommendation={rec}
-            onAccept={handleAcceptRecommendation}
-          />
+          <div key={rec.id} className="card" style={{ borderRadius: '.75rem' }}>
+            <RecommendationCard
+              recommendation={rec}
+              onAccept={handleAcceptRecommendation}
+            />
+          </div>
         ))}
       </div>
 

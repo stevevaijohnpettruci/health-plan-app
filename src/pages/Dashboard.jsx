@@ -10,55 +10,40 @@ export const Dashboard = () => {
 
   return (
     <div className="p-8">
+      <div className="app-container">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">Daily Dashboard</h1>
-          <p className="text-gray-400">{dailyHealth.date}</p>
+      <header className="mb-6 text-center">
+        <h1 className="text-3xl font-extrabold">Daily Dashboard</h1>
+        <p className="text-gray-500 text-sm mt-1">{dailyHealth.date}</p>
+      </header>
+
+      {/* Compact Stats Row */}
+      <div className="stat-row mb-6">
+        <div className="stat-small">
+          <div className="title">Weight</div>
+          <div className="value">{dailyHealth.weight} kg</div>
+        </div>
+        <div className="stat-small">
+          <div className="title">Calories</div>
+          <div className="value">{dailyHealth.calorieIntake} kcal</div>
+        </div>
+        <div className="stat-small">
+          <div className="title">Water</div>
+          <div className="value">{dailyHealth.waterIntake} glasses</div>
+        </div>
+        <div className="stat-small">
+          <div className="title">Activity</div>
+          <div className="value">{dailyHealth.activity} steps</div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          icon="[WEIGHT]"
-          title="Weight"
-          value={dailyHealth.weight}
-          unit="kg"
-          subtitle="Down 0.3kg this week"
-          color="danger"
-        />
-        <StatCard
-          icon="[CALORIES]"
-          title="Calories Today"
-          value={dailyHealth.calorieIntake}
-          unit="kcal"
-          subtitle={`Target ${dailyHealth.calorieTarget} kcal`}
-          color="warning"
-        />
-        <StatCard
-          icon="[WATER]"
-          title="Water Intake"
-          value={dailyHealth.waterIntake}
-          unit="glasses"
-          subtitle={`${Math.round((dailyHealth.waterIntake / dailyHealth.waterTarget) * 100)}% of goal`}
-          color="primary"
-        />
-        <StatCard
-          icon="[ACTIVITY]"
-          title="Activity"
-          value={dailyHealth.activity}
-          unit="steps"
-          subtitle={`Target ${dailyHealth.activityTarget.toLocaleString()}`}
-          color="success"
-        />
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Trend Chart */}
         <div className="lg:col-span-2 card">
-          <h2 className="text-xl font-semibold mb-6">Weight Trend (7 days)</h2>
+          <h2 className="text-lg font-semibold mb-6">Weight trend (7 hari)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={progressData.weeklyWeight}>
               <CartesianGrid strokeDasharray="3 3" stroke="#3a3a3a" />
@@ -70,7 +55,6 @@ export const Dashboard = () => {
               <YAxis 
                 stroke="#999"
                 style={{ fontSize: '12px' }}
-                domain={[67, 73]}
               />
               <Tooltip 
                 contentStyle={{ backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a' }}
@@ -89,16 +73,28 @@ export const Dashboard = () => {
 
         {/* Habits Card */}
         <div className="card">
-          <h2 className="text-xl font-semibold mb-4">Today's Habits</h2>
-          <div className="text-center py-4">
-            <div className="text-5xl font-bold text-primary mb-2">
-              {completedHabits}/{totalHabits}
+          <h2 className="text-lg font-semibold mb-4">Kebiasaan Hari Ini</h2>
+          <div className="space-y-3">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-medium">Sarapan sehat</p>
+                <p className="text-sm text-gray-400">07:30</p>
+              </div>
+              <div className="text-green-500">●</div>
             </div>
-            <p className="text-gray-400 text-sm mb-4">Completed today</p>
-            <div className="space-y-2 text-sm">
-              <p className="text-green-400">✓ Healthy breakfast</p>
-              <p className="text-green-400">✓ Morning water intake</p>
-              <p className="text-green-400">✓ Morning exercise</p>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-medium">Minum 2 gelas air</p>
+                <p className="text-sm text-gray-400">08:00</p>
+              </div>
+              <div className="text-green-500">●</div>
+            </div>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-medium">Olahraga ringan</p>
+                <p className="text-sm text-gray-400">09:00</p>
+              </div>
+              <div className="text-gray-300">○</div>
             </div>
           </div>
         </div>

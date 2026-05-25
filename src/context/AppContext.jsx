@@ -204,10 +204,17 @@ export const AppProvider = ({ children }) => {
   }, [])
 
   const updateUserProfile = useCallback((updates) => {
-    setUserProfile(prev => ({ ...prev, ...updates }))
-    // Persist to localStorage
-    localStorage.setItem('healthplan_profile', JSON.stringify(userProfile))
-  }, [userProfile])
+    setUserProfile(prev => {
+      const next = { ...prev, ...updates }
+      // Persist the updated profile to localStorage using the new value
+      try {
+        localStorage.setItem('healthplan_profile', JSON.stringify(next))
+      } catch (e) {
+        // ignore localStorage errors in environments where it's unavailable
+      }
+      return next
+    })
+  }, [])
 
   const updateBasicIdentity = useCallback((data) => {
     setUserProfile(prev => ({

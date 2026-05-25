@@ -6,7 +6,7 @@ export const Progress = () => {
   const { progressData } = useApp()
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 page-inner">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-2">Health Progress</h1>
