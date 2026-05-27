@@ -2,6 +2,7 @@ import re
 import joblib
 import pandas as pd
 import tensorflow as tf
+from sklearn.preprocessing import MinMaxScaler
 
 
 MODEL_PATH = "artifacts/recipe_recommender.keras"
@@ -142,13 +143,26 @@ def recommend(user_dict, top_k=10):
         verbose=0
     ).flatten()
 
-    # -------------------------
-    # RESULT
-    # -------------------------
+    # COPY FULL RECIPE DATA
     result = recipe_fe.copy()
 
-    # HASIL PREDIKSI MODEL
-    result["recommendation_probability"] = probs
+    # NORMALISASI AI SCORE
+    result["ai_score"] = probs
+
+    # NORMALISASI NUTRITION SCORE
+    nutrition_scaler = MinMaxScaler()
+
+    result["nutrition_score_normalized"] = nutrition_scaler.fit_transform(
+        result[["nutrition_quality_score"]]
+    )
+
+    # HYBRID FINAL SCORE
+    result["recommendation_probability"] = (
+        result["ai_score"] * 0.4
+        +
+        result["nutrition_score_normalized"] * 0.6
+    )
+    
 
     # SORT TOP RECOMMENDATION
     top_recipes = result.nlargest(
@@ -179,7 +193,7 @@ def recommend(user_dict, top_k=10):
                             "recommendation_probability"
                         ]
                     ),
-                    4
+                    10
                 ),
 
             "image":
