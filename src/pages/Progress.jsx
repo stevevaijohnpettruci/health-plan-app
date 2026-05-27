@@ -1,166 +1,334 @@
+import { useState } from 'react'
 import { useApp } from '../hooks/useApp'
-import { ProgressBar } from '../components/index'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
+/* ── Custom tooltip ────────────────────────────────────── */
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null
+  return (
+    <div style={{
+      background: '#FFFFFF',
+      border: '1px solid #F0F0F0',
+      borderRadius: 8,
+      padding: '8px 12px',
+      fontSize: 12,
+      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    }}>
+      <div style={{ color: '#9CA3AF', marginBottom: 2 }}>{label}</div>
+      <div style={{ fontWeight: 600, color: '#F97316' }}>{payload[0].value} kg</div>
+    </div>
+  )
+}
+
+/* ── Nutrition bar row ────────────────────────────────── */
+const NutritionBar = ({ label, value, target, color }) => {
+  const pct = Math.min(Math.round((value / target) * 100), 100)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ fontSize: 12, color: '#374151', width: 96, flexShrink: 0 }}>{label}</div>
+      <div style={{
+        flex: 1, height: 8, borderRadius: 4,
+        background: '#F5F5F5', overflow: 'hidden',
+      }}>
+        <div style={{
+          height: '100%', width: `${pct}%`,
+          background: color, borderRadius: 4,
+          transition: 'width 0.5s ease',
+        }} />
+      </div>
+      <div style={{ fontSize: 11, color: '#9CA3AF', width: 32, textAlign: 'right' }}>{pct}%</div>
+    </div>
+  )
+}
+
+/* ── Stat card ────────────────────────────────────────── */
+const StatCard = ({ label, value, unit, sub, subColor }) => (
+  <div style={{
+    background: '#FFFFFF',
+    border: '1px solid #F0F0F0',
+    borderRadius: 12,
+    padding: '14px 16px',
+  }}>
+    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>{label}</div>
+    <div style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.1 }}>
+      {value}
+      {unit && <span style={{ fontSize: 11, fontWeight: 400, color: '#9CA3AF', marginLeft: 4 }}>{unit}</span>}
+    </div>
+    {sub && <div style={{ fontSize: 11, color: subColor || '#9CA3AF', marginTop: 4 }}>{sub}</div>}
+  </div>
+)
+
+/* ── Streak card ──────────────────────────────────────── */
+const StreakCard = ({ icon, value, label }) => (
+  <div style={{
+    background: '#FFF7ED',
+    borderRadius: 10,
+    padding: '14px 12px',
+    textAlign: 'center',
+  }}>
+    <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>
+    <div style={{ fontSize: 24, fontWeight: 600, color: '#F97316', lineHeight: 1 }}>{value}</div>
+    <div style={{ fontSize: 11, color: '#C2410C', marginTop: 4 }}>{label}</div>
+  </div>
+)
+
+/* ── Period filter button ─────────────────────────────── */
+const FilterBtn = ({ label, active, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      padding: '5px 14px',
+      borderRadius: 99,
+      fontSize: 12,
+      fontWeight: active ? 500 : 400,
+      border: `1px solid ${active ? '#F97316' : '#E5E7EB'}`,
+      background: active ? '#F97316' : 'transparent',
+      color: active ? '#FFFFFF' : '#6B7280',
+      cursor: 'pointer',
+      transition: 'all 0.15s',
+    }}
+  >
+    {label}
+  </button>
+)
+
+/* ── Main Progress component ─────────────────────────── */
 export const Progress = () => {
   const { progressData } = useApp()
+  const [activePeriod, setActivePeriod] = useState('7 days')
+
+  const PERIODS = ['7 days', '30 days', '3 months']
 
   return (
-    <div className="p-8 page-inner">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Health Progress</h1>
-        <div className="flex gap-2 mt-4">
-          {['7 days', '30 days', '3 months'].map(period => (
-            <button key={period} className="btn-secondary text-sm">
-              {period}
-            </button>
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      {/* Page header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>Health Progress</h1>
+          <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 3 }}>
+            Track your health journey over time
+          </p>
+        </div>
+        {/* Period filter */}
+        <div style={{ display: 'flex', gap: 6 }}>
+          {PERIODS.map(p => (
+            <FilterBtn
+              key={p}
+              label={p}
+              active={activePeriod === p}
+              onClick={() => setActivePeriod(p)}
+            />
           ))}
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="card">
-          <p className="text-gray-400 text-sm mb-2">Initial Weight</p>
-          <p className="text-2xl font-bold">70.5 kg</p>
-          <p className="text-xs text-gray-500 mt-1">April 18, 2026</p>
-        </div>
-        <div className="card">
-          <p className="text-gray-400 text-sm mb-2">Current Weight</p>
-          <p className="text-2xl font-bold">68.0 kg</p>
-          <p className="text-danger text-xs mt-1">▼ 2.5 kg measured</p>
-        </div>
-        <div className="card">
-          <p className="text-gray-400 text-sm mb-2">Target Weight</p>
-          <p className="text-2xl font-bold">85.0 kg</p>
-          <p className="text-success text-xs mt-1">3.0 kg more to go</p>
-        </div>
-        <div className="card">
-          <p className="text-gray-400 text-sm mb-2">Active Streak</p>
-          <p className="text-2xl font-bold">6 days</p>
-          <p className="text-warning text-xs mt-1">Best: 12 days</p>
-        </div>
+      {/* Stat cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        <StatCard
+          label="Initial weight"
+          value="70.5"
+          unit="kg"
+          sub="April 18, 2026"
+        />
+        <StatCard
+          label="Current weight"
+          value="68.0"
+          unit="kg"
+          sub="▼ 2.5 kg measured"
+          subColor="#16A34A"
+        />
+        <StatCard
+          label="Target weight"
+          value="65.0"
+          unit="kg"
+          sub="3.0 kg more to go"
+          subColor="#9CA3AF"
+        />
+        <StatCard
+          label="Active streak"
+          value="6"
+          unit="days"
+          sub="Best: 12 days"
+          subColor="#16A34A"
+        />
       </div>
 
-      {/* Weight Chart */}
-      <div className="card mb-8">
-        <h2 className="text-xl font-semibold mb-6">Weight Trend</h2>
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={progressData.weeklyWeight}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#3a3a3a" />
-            <XAxis 
-              dataKey="day" 
-              stroke="#999"
-              style={{ fontSize: '12px' }}
+      {/* Weight trend chart */}
+      <div style={{
+        background: '#FFFFFF',
+        border: '1px solid #F0F0F0',
+        borderRadius: 12,
+        padding: '16px 18px',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>Weight trend</div>
+          <span style={{
+            fontSize: 11, color: '#F97316', fontWeight: 500,
+            background: '#FFF7ED', padding: '2px 10px', borderRadius: 99,
+          }}>
+            70.5 → 68.0 kg this period
+          </span>
+        </div>
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart
+            data={progressData.weeklyWeight}
+            margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#F5F5F5" />
+            <XAxis
+              dataKey="day"
+              tick={{ fontSize: 11, fill: '#9CA3AF' }}
+              axisLine={false}
+              tickLine={false}
             />
-            <YAxis 
-              stroke="#999"
-              style={{ fontSize: '12px' }}
+            <YAxis
+              tick={{ fontSize: 11, fill: '#9CA3AF' }}
+              axisLine={false}
+              tickLine={false}
               domain={[67, 73]}
             />
-            <Tooltip 
-              contentStyle={{ backgroundColor: '#2a2a2a', border: '1px solid #3a3a3a' }}
-              labelStyle={{ color: '#fff' }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="weight" 
-              stroke="#6366f1" 
-              dot={{ fill: '#6366f1', r: 5 }}
-              activeDot={{ r: 7 }}
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="weight"
+              stroke="#F97316"
+              strokeWidth={2.5}
+              dot={{ fill: '#F97316', r: 5, strokeWidth: 0 }}
+              activeDot={{ r: 7, fill: '#F97316' }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Nutrition Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className="card">
-          <h2 className="text-xl font-semibold mb-6">Average Nutrition Achievement</h2>
-          <div className="space-y-5">
-            <ProgressBar 
-              label="Calories" 
-              value={progressData.nutritionToday.calorie.value} 
+      {/* Nutrition + Streak & Badges */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+        {/* Nutrition bars */}
+        <div style={{
+          background: '#FFFFFF',
+          border: '1px solid #F0F0F0',
+          borderRadius: 12,
+          padding: '16px 18px',
+        }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>
+            Average nutrition achievement
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <NutritionBar
+              label="Calories"
+              value={progressData.nutritionToday.calorie.value}
               target={progressData.nutritionToday.calorie.target}
-              color="bg-blue-500"
+              color="#F97316"
             />
-            <ProgressBar 
-              label="Protein" 
-              value={progressData.nutritionToday.protein.value} 
+            <NutritionBar
+              label="Protein"
+              value={progressData.nutritionToday.protein.value}
               target={progressData.nutritionToday.protein.target}
-              color="bg-green-500"
+              color="#FB923C"
             />
-            <ProgressBar 
-              label="Carbs" 
-              value={progressData.nutritionToday.carbs.value} 
+            <NutritionBar
+              label="Carbs"
+              value={progressData.nutritionToday.carbs.value}
               target={progressData.nutritionToday.carbs.target}
-              color="bg-yellow-500"
+              color="#FCD34D"
             />
-            <ProgressBar 
-              label="Lemak" 
-              value={progressData.nutritionToday.fat.value} 
+            <NutritionBar
+              label="Fat"
+              value={progressData.nutritionToday.fat.value}
               target={progressData.nutritionToday.fat.target}
-              color="bg-pink-500"
+              color="#FDBA74"
             />
-            <ProgressBar 
-              label="Serat" 
-              value={55} 
+            <NutritionBar
+              label="Fiber"
+              value={55}
               target={100}
-              color="bg-purple-500"
+              color="#FED7AA"
             />
-            <ProgressBar 
-              label="Air minum" 
-              value={progressData.nutritionToday.water.value} 
+            <NutritionBar
+              label="Water intake"
+              value={progressData.nutritionToday.water.value}
               target={progressData.nutritionToday.water.target}
-              color="bg-cyan-500"
+              color="#38BDF8"
             />
           </div>
         </div>
 
-        <div className="space-y-8">
-          {/* Streak Stats */}
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Streak & konsistensi</h3>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-3xl mb-2">✓</p>
-                <p className="text-2xl font-bold">{progressData.streak.consecutive}</p>
-                <p className="text-xs text-gray-500 mt-1">Hari berturut-turut</p>
-              </div>
-              <div>
-                <p className="text-3xl mb-2">📊</p>
-                <p className="text-2xl font-bold">{progressData.streak.total}</p>
-                <p className="text-xs text-gray-500 mt-1">Total hari aktif</p>
-              </div>
-              <div>
-                <p className="text-3xl mb-2">⭐</p>
-                <p className="text-2xl font-bold">{progressData.streak.longest}</p>
-                <p className="text-xs text-gray-500 mt-1">Streak terpanjang</p>
-              </div>
+        {/* Right column: Streak + Badges */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+          {/* Streak */}
+          <div style={{
+            background: '#FFFFFF',
+            border: '1px solid #F0F0F0',
+            borderRadius: 12,
+            padding: '16px 18px',
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 12 }}>
+              Streak &amp; consistency
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+              <StreakCard
+                icon="🔥"
+                value={progressData.streak.consecutive}
+                label="Days in a row"
+              />
+              <StreakCard
+                icon="📅"
+                value={progressData.streak.total}
+                label="Total active days"
+              />
+              <StreakCard
+                icon="🏆"
+                value={progressData.streak.longest}
+                label="Longest streak"
+              />
             </div>
           </div>
 
           {/* Badges */}
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Pencapaian (badge)</h3>
-            <div className="space-y-2">
+          <div style={{
+            background: '#FFFFFF',
+            border: '1px solid #F0F0F0',
+            borderRadius: 12,
+            padding: '16px 18px',
+            flex: 1,
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 12 }}>
+              Achievements
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
               {progressData.badges.map((badge, idx) => (
-                <div 
+                <div
                   key={idx}
-                  className={`p-2 rounded text-xs ${
-                    badge.earned 
-                      ? 'bg-success/20 text-success' 
-                      : 'bg-dark-input text-gray-500'
-                  }`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    padding: '5px 12px',
+                    borderRadius: 99,
+                    fontSize: 12,
+                    fontWeight: badge.earned ? 500 : 400,
+                    background: badge.earned ? '#FFF7ED' : '#F5F5F5',
+                    border: `1px solid ${badge.earned ? '#FED7AA' : '#E5E7EB'}`,
+                    color: badge.earned ? '#C2410C' : '#9CA3AF',
+                  }}
                 >
-                  {badge.earned ? '✓' : '🔒'} {badge.name}
+                  <span style={{ fontSize: 11 }}>{badge.earned ? '✓' : '🔒'}</span>
+                  {badge.name}
                 </div>
               ))}
             </div>
           </div>
+
         </div>
       </div>
+
     </div>
   )
 }

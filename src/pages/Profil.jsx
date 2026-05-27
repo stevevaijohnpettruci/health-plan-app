@@ -3,6 +3,41 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../hooks/useApp'
 import { useAuth } from '../hooks/useAuth'
 
+const TAB_LIST = [
+  { key: 'general',   label: 'General Info' },
+  { key: 'health',    label: 'Health' },
+  { key: 'lifestyle', label: 'Lifestyle' },
+  { key: 'goals',     label: 'Goals' },
+  { key: 'settings',  label: 'Settings' },
+]
+
+const InfoRow = ({ label, value }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F5F5F5' }}>
+    <span style={{ fontSize: 13, color: '#9CA3AF' }}>{label}</span>
+    <span style={{ fontSize: 13, fontWeight: 500, color: '#1A1A1A' }}>{value || '-'}</span>
+  </div>
+)
+
+const Field = ({ label, children }) => (
+  <div>
+    <label style={{ display: 'block', fontSize: 12, color: '#9CA3AF', marginBottom: 6 }}>{label}</label>
+    {children}
+  </div>
+)
+
+const inputStyle = (editing) => ({
+  width: '100%',
+  padding: '9px 12px',
+  border: `1.5px solid ${editing ? '#F97316' : '#F0F0F0'}`,
+  borderRadius: 8,
+  fontSize: 13,
+  color: editing ? '#1A1A1A' : '#6B7280',
+  background: editing ? '#FFFFFF' : '#FAFAFA',
+  outline: 'none',
+  cursor: editing ? 'text' : 'not-allowed',
+  boxSizing: 'border-box',
+})
+
 export const Profil = () => {
   const { userProfile, updateBasicIdentity } = useApp()
   const { logout } = useAuth()
@@ -31,268 +66,220 @@ export const Profil = () => {
     navigate('/login')
   }
 
+  const initials = userProfile?.fullName
+    ? userProfile.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'U'
+
   return (
-    <div className="p-8 max-w-5xl">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">My Profile</h1>
-          <p className="text-gray-400">Manage your health information</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      {/* Header banner */}
+      <div style={{
+        background: '#F97316',
+        borderRadius: 12,
+        padding: '20px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, fontWeight: 700, color: '#fff', flexShrink: 0,
+          }}>
+            {initials}
+          </div>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{userProfile?.fullName}</div>
+            <div style={{ fontSize: 12, color: '#FED7AA', marginTop: 2 }}>{userProfile?.email}</div>
+            <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
+              <span style={{ fontSize: 11, background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 99 }}>
+                BMI {userProfile?.bmi?.toFixed(1)} · {userProfile?.bmiCategory}
+              </span>
+              <span style={{ fontSize: 11, background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 99 }}>
+                {userProfile?.activityPoints || 0} pts
+              </span>
+            </div>
+          </div>
         </div>
-        {!isEditing && (
-          <button 
+        {!isEditing ? (
+          <button
             onClick={() => setIsEditing(true)}
-            className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+            style={{
+              padding: '8px 18px', borderRadius: 8,
+              background: '#fff', border: 'none',
+              color: '#C2410C', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            }}
           >
             Edit Profile
           </button>
+        ) : (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={handleCancel}
+              style={{
+                padding: '8px 16px', borderRadius: 8,
+                background: 'rgba(255,255,255,0.2)', border: 'none',
+                color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer',
+              }}
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleSave}
+              style={{
+                padding: '8px 18px', borderRadius: 8,
+                background: '#fff', border: 'none',
+                color: '#C2410C', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              Simpan
+            </button>
+          </div>
         )}
       </div>
 
-      {/* Profile Card */}
-      <div className="card mb-8 flex items-center gap-8">
-        <div className="w-24 h-24 bg-gradient-to-br from-orange-600 to-orange-800 rounded-full flex items-center justify-center text-white text-4xl font-bold flex-shrink-0">
-          {userProfile?.fullName?.split(' ').map(n => n.charAt(0)).join('')}
-        </div>
-        <div className="flex-1">
-          <h2 className="text-3xl font-bold mb-1">{userProfile?.fullName}</h2>
-          <p className="text-gray-400 mb-3">{userProfile?.email}</p>
-          <div className="flex gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-orange-600">BMI:</span>
-              <span className="text-gray-300">{userProfile?.bmi.toFixed(1)} ({userProfile?.bmiCategory})</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-blue-500">Points:</span>
-              <span className="text-gray-300">{userProfile?.activityPoints} pts</span>
-            </div>
+      {/* Stat cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        {[
+          { label: 'Berat Badan', value: `${userProfile?.weight} kg` },
+          { label: 'Tinggi Badan', value: `${userProfile?.height} cm` },
+          { label: 'Usia', value: `${userProfile?.age} tahun` },
+          { label: 'Target Berat', value: `${userProfile?.targetWeight} kg` },
+        ].map(({ label, value }) => (
+          <div key={label} style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, padding: '14px 16px' }}>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>{label}</div>
+            <div style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>{value}</div>
           </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex border-b border-gray-700 mb-8 overflow-x-auto">
-        {['general', 'health', 'lifestyle', 'goals', 'settings'].map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-6 py-3 font-semibold whitespace-nowrap transition ${
-              activeTab === tab
-                ? 'text-orange-500 border-b-2 border-orange-500'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            {tab === 'general' && 'General Info'}
-            {tab === 'health' && 'Health'}
-            {tab === 'lifestyle' && 'Lifestyle'}
-            {tab === 'goals' && 'Goals'}
-            {tab === 'settings' && 'Settings'}
-          </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      <div>
-        {/* General Tab */}
-        {activeTab === 'general' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Informasi Dasar</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Nama Lengkap</label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData?.fullName || ''}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className={`w-full px-4 py-2 border-2 border-gray-700 rounded-lg focus:outline-none transition ${
-                      isEditing ? 'bg-gray-900 border-orange-500 focus:border-orange-600' : 'bg-gray-800 cursor-not-allowed'
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData?.email || ''}
-                    onChange={handleChange}
-                    disabled={true}
-                    className="w-full px-4 py-2 border-2 border-gray-700 rounded-lg bg-gray-800 cursor-not-allowed text-gray-500"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Email tidak dapat diubah</p>
-                </div>
-              </div>
-            </div>
+      {/* Tabs + Content */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, overflow: 'hidden' }}>
 
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Data Biometrik</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Usia</label>
-                    <input
-                      type="number"
-                      name="age"
-                      value={formData?.age || ''}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border-2 border-gray-700 rounded-lg focus:outline-none transition ${
-                        isEditing ? 'bg-gray-900 border-orange-500 focus:border-orange-600' : 'bg-gray-800 cursor-not-allowed'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Jenis Kelamin</label>
-                    <select
-                      name="gender"
-                      value={formData?.gender || 'Male'}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border-2 border-gray-700 rounded-lg focus:outline-none transition ${
-                        isEditing ? 'bg-gray-900 border-orange-500 focus:border-orange-600' : 'bg-gray-800 cursor-not-allowed'
-                      }`}
-                    >
+        {/* Tab bar */}
+        <div style={{ display: 'flex', borderBottom: '1px solid #F0F0F0', padding: '0 20px' }}>
+          {TAB_LIST.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              style={{
+                padding: '14px 18px',
+                fontSize: 13,
+                fontWeight: activeTab === key ? 600 : 400,
+                color: activeTab === key ? '#F97316' : '#9CA3AF',
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === key ? '2px solid #F97316' : '2px solid transparent',
+                cursor: 'pointer',
+                marginBottom: -1,
+                transition: 'all 0.15s',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        <div style={{ padding: '20px 24px' }}>
+
+          {/* General */}
+          {activeTab === 'general' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>Informasi Dasar</div>
+                <Field label="Nama Lengkap">
+                  <input type="text" name="fullName" value={formData?.fullName || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
+                </Field>
+                <Field label="Email">
+                  <input type="email" name="email" value={formData?.email || ''} disabled style={inputStyle(false)} />
+                  <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Email tidak dapat diubah</div>
+                </Field>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>Data Biometrik</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <Field label="Usia">
+                    <input type="number" name="age" value={formData?.age || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
+                  </Field>
+                  <Field label="Jenis Kelamin">
+                    <select name="gender" value={formData?.gender || 'Male'} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)}>
                       <option value="Male">Laki-laki</option>
                       <option value="Female">Perempuan</option>
                     </select>
-                  </div>
+                  </Field>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Health Tab */}
-        {activeTab === 'health' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Pengukuran Tubuh</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Berat Badan (kg)</label>
-                    <input
-                      type="number"
-                      name="weight"
-                      step="0.1"
-                      value={formData?.weight || ''}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border-2 border-gray-700 rounded-lg focus:outline-none transition ${
-                        isEditing ? 'bg-gray-900 border-orange-500 focus:border-orange-600' : 'bg-gray-800 cursor-not-allowed'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Tinggi Badan (cm)</label>
-                    <input
-                      type="number"
-                      name="height"
-                      value={formData?.height || ''}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border-2 border-gray-700 rounded-lg focus:outline-none transition ${
-                        isEditing ? 'bg-gray-900 border-orange-500 focus:border-orange-600' : 'bg-gray-800 cursor-not-allowed'
-                      }`}
-                    />
-                  </div>
+          {/* Health */}
+          {activeTab === 'health' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Pengukuran Tubuh</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <Field label="Berat Badan (kg)">
+                    <input type="number" name="weight" step="0.1" value={formData?.weight || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
+                  </Field>
+                  <Field label="Tinggi Badan (cm)">
+                    <input type="number" name="height" value={formData?.height || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
+                  </Field>
                 </div>
               </div>
-            </div>
-
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Informasi Kesehatan</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Riwayat Medis:</span>
-                  <span className="text-gray-200">{userProfile?.medicalHistory?.length > 0 ? userProfile.medicalHistory.join(', ') : 'Tidak ada'}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Alergi:</span>
-                  <span className="text-gray-200">{userProfile?.allergies?.length > 0 ? userProfile.allergies.join(', ') : 'Tidak ada'}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Tekanan Darah:</span>
-                  <span className="text-gray-200">{userProfile?.bloodPressure?.systolic ? `${userProfile.bloodPressure.systolic}/${userProfile.bloodPressure.diastolic} mmHg` : '-'}</span>
-                </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Informasi Kesehatan</div>
+                <InfoRow label="Riwayat Medis" value={userProfile?.medicalHistory?.length > 0 ? userProfile.medicalHistory.join(', ') : 'Tidak ada'} />
+                <InfoRow label="Alergi" value={userProfile?.allergies?.length > 0 ? userProfile.allergies.join(', ') : 'Tidak ada'} />
+                <InfoRow label="Tekanan Darah" value={userProfile?.bloodPressure?.systolic ? `${userProfile.bloodPressure.systolic}/${userProfile.bloodPressure.diastolic} mmHg` : '-'} />
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Lifestyle Tab */}
-        {activeTab === 'lifestyle' && (
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-6">Gaya Hidup</h3>
-            <div className="space-y-4 text-sm">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-gray-400">Pola Makan: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.dietaryPattern}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Frekuensi Makan: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.mealsPerDay} kali/hari</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Target Air Minum: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.dailyWaterIntakeGoal} ml/hari</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Jam Tidur Rata-rata: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.avgSleepHours} jam</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Kebiasaan Merokok: </span>
-                  <span className={`font-semibold ${userProfile?.smokingHabits === 'No' ? 'text-green-400' : 'text-red-400'}`}>
-                    {userProfile?.smokingHabits === 'No' ? 'Tidak Merokok' : 'Merokok'}
+          {/* Lifestyle */}
+          {activeTab === 'lifestyle' && (
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Gaya Hidup</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                <InfoRow label="Pola Makan" value={userProfile?.dietaryPattern} />
+                <InfoRow label="Frekuensi Makan" value={userProfile?.mealsPerDay ? `${userProfile.mealsPerDay} kali/hari` : '-'} />
+                <InfoRow label="Target Air Minum" value={userProfile?.dailyWaterIntakeGoal ? `${userProfile.dailyWaterIntakeGoal} ml/hari` : '-'} />
+                <InfoRow label="Jam Tidur Rata-rata" value={userProfile?.avgSleepHours ? `${userProfile.avgSleepHours} jam` : '-'} />
+                <InfoRow label="Tingkat Aktivitas" value={userProfile?.activityLevel} />
+              </div>
+            </div>
+          )}
+
+          {/* Goals */}
+          {activeTab === 'goals' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Tujuan Kesehatan</div>
+                <InfoRow label="Tujuan Utama" value={userProfile?.primaryGoal} />
+                <InfoRow label="Target Berat Badan" value={userProfile?.targetWeight ? `${userProfile.targetWeight} kg` : '-'} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F5F5F5' }}>
+                  <span style={{ fontSize: 13, color: '#9CA3AF' }}>Selisih Target</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#F97316' }}>
+                    {userProfile?.weight && userProfile?.targetWeight ? `${(userProfile.weight - userProfile.targetWeight).toFixed(1)} kg` : '-'}
                   </span>
                 </div>
-                <div>
-                  <span className="text-gray-400">Tingkat Aktivitas: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.activityLevel}</span>
-                </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Goals Tab */}
-        {activeTab === 'goals' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Tujuan Kesehatan</h3>
-              <div className="space-y-4 text-sm">
-                <div>
-                  <span className="text-gray-400">Tujuan Utama: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.primaryGoal}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Target Berat Badan: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.targetWeight} kg</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Selisih Target: </span>
-                  <span className="font-semibold text-orange-400">{(userProfile?.weight - userProfile?.targetWeight).toFixed(1)} kg</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Komitmen</h3>
-              <div className="space-y-4 text-sm">
-                <div>
-                  <span className="text-gray-400">Olahraga Per Minggu: </span>
-                  <span className="font-semibold text-gray-200">{userProfile?.commitmentDays} hari</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">Aktivitas Pilihan: </span>
-                  <div className="flex flex-wrap gap-2 mt-2">
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Komitmen</div>
+                <InfoRow label="Olahraga Per Minggu" value={userProfile?.commitmentDays ? `${userProfile.commitmentDays} hari` : '-'} />
+                <div style={{ padding: '10px 0' }}>
+                  <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 8 }}>Aktivitas Pilihan</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {userProfile?.preferredActivities?.map(activity => (
-                      <span key={activity} className="px-3 py-1 bg-orange-600 rounded-full text-xs">
+                      <span key={activity} style={{
+                        padding: '4px 12px', borderRadius: 99,
+                        background: '#FFF7ED', color: '#C2410C',
+                        fontSize: 12, fontWeight: 500,
+                      }}>
                         {activity}
                       </span>
                     ))}
@@ -300,50 +287,38 @@ export const Profil = () => {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Settings Tab */}
-        {activeTab === 'settings' && (
-          <div className="space-y-8">
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-6">Akun</h3>
-              <div className="space-y-4">
-                <p className="text-gray-400 text-sm">Email: {userProfile?.email}</p>
-                <p className="text-gray-400 text-sm">Bergabung: {new Date(userProfile?.registeredAt).toLocaleDateString('id-ID')}</p>
+          {/* Settings */}
+          {activeTab === 'settings' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Akun</div>
+                <InfoRow label="Email" value={userProfile?.email} />
+                <InfoRow label="Bergabung" value={userProfile?.registeredAt ? new Date(userProfile.registeredAt).toLocaleDateString('id-ID') : '-'} />
+              </div>
+              <div style={{ borderTop: '1px solid #F0F0F0', paddingTop: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#EF4444', marginBottom: 12 }}>Zona Bahaya</div>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    padding: '10px 20px', borderRadius: 8,
+                    background: '#FEF2F2', border: '1px solid #FECACA',
+                    color: '#DC2626', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
+                  Logout
+                </button>
               </div>
             </div>
+          )}
 
-            <div className="card border-l-4 border-red-500">
-              <h3 className="text-lg font-semibold mb-4 text-red-500">Zona Bahaya</h3>
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-semibold"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Save/Cancel Buttons */}
-      {isEditing && (
-        <div className="fixed bottom-8 right-8 flex gap-4">
-          <button
-            onClick={handleCancel}
-            className="px-6 py-2 border-2 border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition"
-          >
-            Batal
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
-          >
-            Simpan
-          </button>
         </div>
-      )}
+      </div>
     </div>
   )
 }

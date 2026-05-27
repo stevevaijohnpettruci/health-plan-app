@@ -55,7 +55,6 @@ export const HealthSecurity = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
-
     if (formData.bloodPressure.systolic && formData.bloodPressure.diastolic) {
       const systolic = parseInt(formData.bloodPressure.systolic)
       const diastolic = parseInt(formData.bloodPressure.diastolic)
@@ -64,17 +63,15 @@ export const HealthSecurity = () => {
         return
       }
     }
-
     if (formData.heartRate && (formData.heartRate < 30 || formData.heartRate > 200)) {
       setError('Heart rate must be between 30-200 bpm')
       return
     }
-
     setLoading(true)
     try {
       updateHealthSecurity({
         ...formData,
-        bloodPressure: formData.bloodPressure.systolic && formData.bloodPressure.diastolic 
+        bloodPressure: formData.bloodPressure.systolic && formData.bloodPressure.diastolic
           ? { systolic: parseInt(formData.bloodPressure.systolic), diastolic: parseInt(formData.bloodPressure.diastolic) }
           : null,
         heartRate: formData.heartRate ? parseInt(formData.heartRate) : null
@@ -88,171 +85,223 @@ export const HealthSecurity = () => {
     }
   }
 
+  const inputStyle = {
+    width: '100%', padding: '10px 14px',
+    border: '1.5px solid #E5E7EB', borderRadius: 8,
+    fontSize: 14, color: '#1A1A1A', background: '#FFFFFF',
+    outline: 'none', boxSizing: 'border-box',
+  }
+
+  const labelStyle = {
+    display: 'block', fontSize: 12, fontWeight: 600,
+    color: '#6B7280', marginBottom: 6,
+  }
+
+  const sectionTitle = {
+    fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 10,
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl overflow-hidden shadow-xl">
-        <div className="bg-orange-500 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center"> </div>
-            <div className="text-white font-semibold">HealthPlan</div>
+    <div style={{
+      minHeight: '100vh', background: '#F3F4F6',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px',
+    }}>
+      <div style={{
+        width: '100%', maxWidth: '560px', borderRadius: 16,
+        overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', background: '#FFFFFF',
+      }}>
+
+        {/* Header */}
+        <div style={{
+          background: '#F97316', padding: '14px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 9,
+              background: 'rgba(255,255,255,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>HealthPlan</span>
           </div>
-          <div className="text-orange-100 text-sm">Step 3 of 4<span className="h-2 inline-block"/></div>
+          <span style={{ fontSize: 13, color: '#FED7AA' }}>Step 3 of 4</span>
         </div>
 
-        <div className="p-8 overflow-visible">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">Health Security</h1>
-            <p className="text-gray-500 text-sm">Your medical history and health restrictions</p>
+        {/* Body */}
+        <div style={{ padding: '28px 28px 24px' }}>
+
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A' }}>Health Security</div>
+            <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 4 }}>Your medical history and health restrictions</div>
           </div>
 
-          <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-            <p className="text-yellow-700 text-sm">
+          {/* Warning */}
+          <div style={{
+            padding: '10px 14px', background: '#FFFBEB',
+            borderLeft: '3px solid #F59E0B', borderRadius: 6, marginBottom: 20,
+          }}>
+            <p style={{ fontSize: 12, color: '#B45309', margin: 0 }}>
               Warning: This information is very important to ensure AI recommendations are safe for your health condition.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+            {/* Medical History */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Medical History (Select applicable)</label>
-              <div className="space-y-2">
+              <div style={sectionTitle}>Medical History <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(Select applicable)</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                 {medicalOptions.map(condition => (
-                  <label key={condition} className="flex items-center cursor-pointer">
+                  <label key={condition} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '7px 10px', border: '1.5px solid', borderColor: formData.medicalHistory.includes(condition) ? '#F97316' : '#E5E7EB', borderRadius: 8, background: formData.medicalHistory.includes(condition) ? '#FFF7ED' : '#FFFFFF' }}>
                     <input
                       type="checkbox"
                       checked={formData.medicalHistory.includes(condition)}
                       onChange={() => handleMedicalChange(condition)}
-                      className="w-4 h-4 text-orange-600 rounded"
+                      style={{ accentColor: '#F97316', width: 14, height: 14 }}
                     />
-                    <span className="ml-3 text-gray-700">{condition}</span>
+                    <span style={{ fontSize: 13, color: '#374151' }}>{condition}</span>
                   </label>
                 ))}
               </div>
             </div>
 
+            {/* Physical Injury */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Physical Injury History (optional)</label>
+              <label style={labelStyle}>Physical Injury History <span style={{ fontWeight: 400 }}>(optional)</span></label>
               <textarea
                 name="physicalInjuries"
                 value={formData.physicalInjuries}
                 onChange={handleInputChange}
                 placeholder="Example: Knee injury in 2023, Chronic back problems..."
                 rows="3"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition resize-none"
+                style={{ ...inputStyle, resize: 'none' }}
+                onFocus={e => e.target.style.borderColor = '#F97316'}
+                onBlur={e => e.target.style.borderColor = '#E5E7EB'}
               />
             </div>
 
+            {/* Medication */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Obat-obatan yang Sedang Dikonsumsi (opsional)</label>
+              <label style={labelStyle}>Current Medication <span style={{ fontWeight: 400 }}>(optional)</span></label>
               <input
-                type="text"
-                name="currentMedication"
-                value={formData.currentMedication}
-                onChange={handleInputChange}
-                placeholder="Contoh: Metformin, Atorvastatin..."
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition"
+                type="text" name="currentMedication"
+                value={formData.currentMedication} onChange={handleInputChange}
+                placeholder="Example: Metformin, Atorvastatin..."
+                style={inputStyle}
+                onFocus={e => e.target.style.borderColor = '#F97316'}
+                onBlur={e => e.target.style.borderColor = '#E5E7EB'}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Blood Pressure + Heart Rate */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Sistolik</label>
+                <label style={labelStyle}>Systolic</label>
                 <input
-                  type="number"
-                  name="systolic"
-                  min="60"
-                  max="200"
-                  value={formData.bloodPressure.systolic}
-                  onChange={handleInputChange}
-                  placeholder="120"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition"
+                  type="number" name="systolic" min="60" max="200"
+                  value={formData.bloodPressure.systolic} onChange={handleInputChange}
+                  placeholder="120" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = '#F97316'}
+                  onBlur={e => e.target.style.borderColor = '#E5E7EB'}
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">Diastolik</label>
+                <label style={labelStyle}>Diastolic</label>
                 <input
-                  type="number"
-                  name="diastolic"
-                  min="40"
-                  max="150"
-                  value={formData.bloodPressure.diastolic}
-                  onChange={handleInputChange}
-                  placeholder="80"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition"
+                  type="number" name="diastolic" min="40" max="150"
+                  value={formData.bloodPressure.diastolic} onChange={handleInputChange}
+                  placeholder="80" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = '#F97316'}
+                  onBlur={e => e.target.style.borderColor = '#E5E7EB'}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Heart Rate (bpm)</label>
+                <input
+                  type="number" name="heartRate" min="30" max="200"
+                  value={formData.heartRate} onChange={handleInputChange}
+                  placeholder="72" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = '#F97316'}
+                  onBlur={e => e.target.style.borderColor = '#E5E7EB'}
                 />
               </div>
             </div>
 
+            {/* Allergies */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Detak Jantung Istirahat (bpm) - Opsional</label>
-              <input
-                type="number"
-                name="heartRate"
-                min="30"
-                max="200"
-                value={formData.heartRate}
-                onChange={handleInputChange}
-                placeholder="Contoh: 72"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Alergi Makanan (Pilih yang sesuai)</label>
-              <div className="grid grid-cols-2 gap-2">
+              <div style={sectionTitle}>Food Allergies <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(Select applicable)</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                 {commonAllergies.map(allergy => (
-                  <label key={allergy} className="flex items-center cursor-pointer">
+                  <label key={allergy} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '7px 10px', border: '1.5px solid', borderColor: formData.allergies.includes(allergy) ? '#F97316' : '#E5E7EB', borderRadius: 8, background: formData.allergies.includes(allergy) ? '#FFF7ED' : '#FFFFFF' }}>
                     <input
                       type="checkbox"
                       checked={formData.allergies.includes(allergy)}
                       onChange={() => handleAllergyChange(allergy)}
-                      className="w-4 h-4 text-orange-600 rounded"
+                      style={{ accentColor: '#F97316', width: 14, height: 14 }}
                     />
-                    <span className="ml-2 text-gray-700 text-sm">{allergy}</span>
+                    <span style={{ fontSize: 13, color: '#374151' }}>{allergy}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                <p className="text-red-700 text-sm font-medium">{error}</p>
+              <div style={{ padding: '10px 14px', background: '#FEF2F2', borderLeft: '3px solid #EF4444', borderRadius: 6 }}>
+                <p style={{ fontSize: 13, color: '#DC2626', margin: 0 }}>{error}</p>
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-4 w-full">
-              <div>
-                <button
-                  type="button"
-                  onClick={() => navigate('/onboarding/lifestyle')}
-                  className="px-6 py-3 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                >
-                  Kembali
-                </button>
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-orange-600 text-white font-bold py-3 px-6 rounded-lg ml-4 shadow-lg hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Menyimpan...' : 'Lanjut'}
-                </button>
-              </div>
+            {/* Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+              <button
+                type="button"
+                onClick={() => navigate('/onboarding/lifestyle')}
+                style={{
+                  padding: '10px 20px', borderRadius: 8,
+                  border: '1px solid #E5E7EB', background: '#FFFFFF',
+                  fontSize: 13, color: '#6B7280', cursor: 'pointer',
+                }}
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: '10px 28px', borderRadius: 8,
+                  background: loading ? '#FDBA74' : '#F97316',
+                  border: 'none', color: '#fff',
+                  fontSize: 14, fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {loading ? 'Saving...' : 'Next'}
+              </button>
             </div>
           </form>
 
-          <div className="mt-8">
-            <div className="text-sm text-gray-600 mb-2">Progress: 3 / 4 steps <span className="float-right text-orange-600">75%</span></div>
-            <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-3">
-              <div style={{ width: '75%' }} className="bg-orange-500 h-2" />
+          {/* Progress */}
+          <div style={{ marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginBottom: 6 }}>
+              <span>Progress: 3 / 4 steps</span>
+              <span style={{ color: '#F97316', fontWeight: 600 }}>75%</span>
             </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <div>Basic info</div>
-              <div>Lifestyle</div>
-              <div className="text-orange-600 font-semibold">Medical</div>
-              <div>Goals</div>
+            <div style={{ width: '100%', height: 6, background: '#F3F4F6', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ width: '75%', height: '100%', background: '#F97316', borderRadius: 99 }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+              {['Basic info', 'Lifestyle', 'Medical', 'Goals'].map((step, i) => (
+                <span key={step} style={{ fontSize: 11, fontWeight: i === 2 ? 600 : 400, color: i === 2 ? '#F97316' : '#9CA3AF' }}>
+                  {step}
+                </span>
+              ))}
             </div>
           </div>
+
         </div>
       </div>
     </div>

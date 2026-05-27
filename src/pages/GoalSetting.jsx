@@ -43,30 +43,15 @@ export const GoalSetting = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
-
-    if (!formData.targetWeight) {
-      setError('Target weight is required')
-      return
-    }
-
-    if (formData.preferredActivities.length === 0) {
-      setError('Select at least one preferred activity')
-      return
-    }
-
+    if (!formData.targetWeight) { setError('Target weight is required'); return }
+    if (formData.preferredActivities.length === 0) { setError('Select at least one preferred activity'); return }
     const targetWeight = parseFloat(formData.targetWeight)
-    if (targetWeight < 30 || targetWeight > 300) {
-      setError('Target weight must be between 30-300 kg')
-      return
-    }
-
+    if (targetWeight < 30 || targetWeight > 300) { setError('Target weight must be between 30-300 kg'); return }
     setLoading(true)
     try {
       updateGoalSetting(formData)
       completeOnboardingStep(formData)
-      setTimeout(() => {
-        navigate('/')
-      }, 500)
+      setTimeout(() => navigate('/'), 500)
     } catch (err) {
       setError('Failed to save data: ' + err.message)
     } finally {
@@ -74,37 +59,75 @@ export const GoalSetting = () => {
     }
   }
 
+  const inputStyle = {
+    width: '100%', padding: '10px 14px',
+    border: '1.5px solid #E5E7EB', borderRadius: 8,
+    fontSize: 14, color: '#1A1A1A', background: '#FFFFFF',
+    outline: 'none', boxSizing: 'border-box',
+  }
+
+  const labelStyle = {
+    display: 'block', fontSize: 12, fontWeight: 600,
+    color: '#6B7280', marginBottom: 8,
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl overflow-hidden shadow-xl">
-        <div className="bg-orange-500 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center"> </div>
-            <div className="text-white font-semibold">HealthPlan</div>
+    <div style={{
+      minHeight: '100vh', background: '#F3F4F6',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px',
+    }}>
+      <div style={{
+        width: '100%', maxWidth: '560px', borderRadius: 16,
+        overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', background: '#FFFFFF',
+      }}>
+
+        {/* Header */}
+        <div style={{
+          background: '#F97316', padding: '14px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 9,
+              background: 'rgba(255,255,255,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>HealthPlan</span>
           </div>
-          <div className="text-orange-100 text-sm">Step 4 of 4<span className="h-2 inline-block"/></div>
+          <span style={{ fontSize: 13, color: '#FED7AA' }}>Step 4 of 4</span>
         </div>
 
-        <div className="p-8 overflow-visible">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">Health Goals</h1>
-            <p className="text-gray-500 text-sm">Set your commitment and targets</p>
+        {/* Body */}
+        <div style={{ padding: '28px 28px 24px' }}>
+
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A' }}>Health Goals</div>
+            <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 4 }}>Set your commitment and targets</div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+            {/* Primary Goal */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Primary Health Goal *</label>
-              <div className="grid grid-cols-2 gap-3">
+              <label style={labelStyle}>Primary Health Goal *</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {goals.map(goal => (
                   <button
                     key={goal}
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, primaryGoal: goal }))}
-                    className={`p-4 rounded-lg border-2 transition font-semibold ${
-                      formData.primaryGoal === goal
-                        ? 'bg-orange-50 border-orange-600 text-orange-600'
-                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-orange-300'
-                    }`}
+                    style={{
+                      padding: '12px 10px', borderRadius: 8, cursor: 'pointer',
+                      border: `1.5px solid ${formData.primaryGoal === goal ? '#F97316' : '#E5E7EB'}`,
+                      background: formData.primaryGoal === goal ? '#FFF7ED' : '#FAFAFA',
+                      color: formData.primaryGoal === goal ? '#C2410C' : '#6B7280',
+                      fontSize: 13, fontWeight: formData.primaryGoal === goal ? 600 : 400,
+                      transition: 'all 0.15s',
+                    }}
                   >
                     {goal}
                   </button>
@@ -112,127 +135,160 @@ export const GoalSetting = () => {
               </div>
             </div>
 
+            {/* Target Weight */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Target Weight (kg) *</label>
-              <div className="flex items-center gap-4">
+              <label style={labelStyle}>Target Weight (kg) *</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <input
-                  type="number"
-                  name="targetWeight"
-                  step="0.1"
-                  min="30"
-                  max="300"
-                  value={formData.targetWeight}
-                  onChange={handleChange}
+                  type="number" name="targetWeight" step="0.1" min="30" max="300"
+                  value={formData.targetWeight} onChange={handleChange}
                   placeholder="Example: 65"
-                  className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition"
+                  style={{ ...inputStyle, flex: 1 }}
+                  onFocus={e => e.target.style.borderColor = '#F97316'}
+                  onBlur={e => e.target.style.borderColor = '#E5E7EB'}
                 />
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">Difference from now:</p>
-                  <p className="text-xl font-bold text-orange-600">
-                    {userProfile?.weight && formData.targetWeight 
-                      ? (parseFloat(formData.targetWeight) - userProfile.weight).toFixed(1) 
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>Difference from now:</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#F97316' }}>
+                    {userProfile?.weight && formData.targetWeight
+                      ? (parseFloat(formData.targetWeight) - userProfile.weight).toFixed(1)
                       : '-'} kg
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Commitment Days */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Komitmen Olahraga Per Minggu *</label>
-              <div className="flex items-center gap-4">
+              <label style={labelStyle}>Exercise per Week *</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <input
-                  type="range"
-                  name="commitmentDays"
-                  min="1"
-                  max="7"
-                  value={formData.commitmentDays}
-                  onChange={handleChange}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  type="range" name="commitmentDays" min="1" max="7"
+                  value={formData.commitmentDays} onChange={handleChange}
+                  style={{ flex: 1, accentColor: '#F97316', height: 4, cursor: 'pointer' }}
                 />
-                <div className="w-16 text-center">
-                  <span className="text-2xl font-bold text-orange-600">{formData.commitmentDays}</span>
-                  <span className="text-xs text-gray-600 block">hari/minggu</span>
+                <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: '#F97316' }}>{formData.commitmentDays}</span>
+                  <span style={{ fontSize: 11, color: '#9CA3AF', display: 'block' }}>days/week</span>
                 </div>
               </div>
-              <div className="flex mt-3 gap-1">
-                {[1, 2, 3, 4, 5, 6, 7].map(day => (
-                  <div
-                    key={day}
-                    className={`flex-1 h-2 rounded ${
-                      day <= formData.commitmentDays ? 'bg-orange-600' : 'bg-gray-200'
-                    }`}
-                  />
+              <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+                {[1,2,3,4,5,6,7].map(day => (
+                  <div key={day} style={{
+                    flex: 1, height: 6, borderRadius: 99,
+                    background: day <= formData.commitmentDays ? '#F97316' : '#F3F4F6',
+                  }} />
                 ))}
               </div>
             </div>
 
+            {/* Preferred Activities */}
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-2">Aktivitas Pilihan (Pilih minimal 1) *</label>
-              <select
-                name="preferredActivities"
-                multiple
-                size={4}
-                value={formData.preferredActivities}
-                onChange={handlePreferredActivitiesChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition"
-              >
+              <label style={labelStyle}>Preferred Activities * <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(Select at least 1)</span></label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {activities.map(activity => (
-                  <option key={activity} value={activity}>{activity}</option>
+                  <button
+                    key={activity}
+                    type="button"
+                    onClick={() => handleActivityToggle(activity)}
+                    style={{
+                      padding: '9px 12px', borderRadius: 8, cursor: 'pointer',
+                      border: `1.5px solid ${formData.preferredActivities.includes(activity) ? '#F97316' : '#E5E7EB'}`,
+                      background: formData.preferredActivities.includes(activity) ? '#FFF7ED' : '#FAFAFA',
+                      color: formData.preferredActivities.includes(activity) ? '#C2410C' : '#6B7280',
+                      fontSize: 13, fontWeight: formData.preferredActivities.includes(activity) ? 600 : 400,
+                      textAlign: 'left', transition: 'all 0.15s',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                    }}
+                  >
+                    <span style={{
+                      width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                      border: `1.5px solid ${formData.preferredActivities.includes(activity) ? '#F97316' : '#D1D5DB'}`,
+                      background: formData.preferredActivities.includes(activity) ? '#F97316' : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {formData.preferredActivities.includes(activity) && (
+                        <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5l2.5 2.5L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </span>
+                    {activity}
+                  </button>
                 ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-2">Tekan Ctrl (Windows) / Cmd (Mac) untuk memilih beberapa aktivitas.</p>
+              </div>
             </div>
 
-            <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-              <h3 className="font-semibold text-orange-900 mb-2">Ringkasan Komitmen Anda:</h3>
-              <ul className="text-sm text-orange-800 space-y-1">
-                <li>Tujuan: <span className="font-semibold">{formData.primaryGoal}</span></li>
-                <li>Target Berat: <span className="font-semibold">{formData.targetWeight} kg</span></li>
-                <li>Olahraga: <span className="font-semibold">{formData.commitmentDays} hari/minggu</span></li>
-                <li>Aktivitas: <span className="font-semibold">{formData.preferredActivities.join(', ')}</span></li>
-              </ul>
+            {/* Summary */}
+            <div style={{ padding: '12px 16px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#C2410C', marginBottom: 8 }}>Commitment Summary</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {[
+                  { label: 'Goal', value: formData.primaryGoal },
+                  { label: 'Target Weight', value: formData.targetWeight ? `${formData.targetWeight} kg` : '-' },
+                  { label: 'Exercise', value: `${formData.commitmentDays} days/week` },
+                  { label: 'Activities', value: formData.preferredActivities.length > 0 ? formData.preferredActivities.join(', ') : '-' },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ fontSize: 12, color: '#EA580C' }}>
+                    {label}: <span style={{ fontWeight: 600 }}>{value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                <p className="text-red-700 text-sm font-medium">{error}</p>
+              <div style={{ padding: '10px 14px', background: '#FEF2F2', borderLeft: '3px solid #EF4444', borderRadius: 6 }}>
+                <p style={{ fontSize: 13, color: '#DC2626', margin: 0 }}>{error}</p>
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-4 w-full">
-              <div>
-                <button
-                  type="button"
-                  onClick={() => navigate('/onboarding/health-security')}
-                  className="px-6 py-3 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                >
-                  Kembali
-                </button>
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-10 py-3 bg-orange-600 text-white font-semibold rounded-lg ml-4 shadow-lg hover:shadow-xl transition"
-                >
-                  {loading ? 'Menyelesaikan...' : 'Selesai Mendaftar'}
-                </button>
-              </div>
+            {/* Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+              <button
+                type="button"
+                onClick={() => navigate('/onboarding/health-security')}
+                style={{
+                  padding: '10px 20px', borderRadius: 8,
+                  border: '1px solid #E5E7EB', background: '#FFFFFF',
+                  fontSize: 13, color: '#6B7280', cursor: 'pointer',
+                }}
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: '10px 28px', borderRadius: 8,
+                  background: loading ? '#FDBA74' : '#F97316',
+                  border: 'none', color: '#fff',
+                  fontSize: 14, fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {loading ? 'Saving...' : 'Finish'}
+              </button>
             </div>
           </form>
 
-          <div className="mt-8">
-            <div className="text-sm text-gray-600 mb-2">Progress: 4 / 4 steps <span className="float-right text-orange-600">100%</span></div>
-            <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-3">
-              <div style={{ width: '100%' }} className="bg-orange-500 h-2" />
+          {/* Progress */}
+          <div style={{ marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#6B7280', marginBottom: 6 }}>
+              <span>Progress: 4 / 4 steps</span>
+              <span style={{ color: '#F97316', fontWeight: 600 }}>100%</span>
             </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <div>Basic info</div>
-              <div>Lifestyle</div>
-              <div>Medical</div>
-              <div className="text-orange-600 font-semibold">Goals</div>
+            <div style={{ width: '100%', height: 6, background: '#F3F4F6', borderRadius: 99, overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '100%', background: '#F97316', borderRadius: 99 }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+              {['Basic info', 'Lifestyle', 'Medical', 'Goals'].map((step, i) => (
+                <span key={step} style={{ fontSize: 11, fontWeight: i === 3 ? 600 : 400, color: i === 3 ? '#F97316' : '#9CA3AF' }}>
+                  {step}
+                </span>
+              ))}
             </div>
           </div>
+
         </div>
       </div>
     </div>
