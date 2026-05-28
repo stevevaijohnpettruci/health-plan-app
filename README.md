@@ -18,7 +18,7 @@ Folder ini berisi seluruh artefak model machine learning untuk sistem rekomendas
 ├── notebook.ipynb
 ├── requirements.txt
 └── README.md
-
+.
 ```bash
 
 ## Deskripsi File
