@@ -19,6 +19,8 @@ Folder ini berisi seluruh artefak model machine learning untuk sistem rekomendas
 ├── requirements.txt
 └── README.md
 
+```bash
+
 ## Deskripsi File
 
 ### `food_recommendation_model.keras`
