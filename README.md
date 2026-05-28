@@ -5,6 +5,9 @@ Health Plan App adalah aplikasi berbasis AI yang dirancang untuk membantu penggu
 Folder ini berisi seluruh artefak model machine learning untuk sistem rekomendasi makanan pada aplikasi Health Plan App.
 
 ## Struktur Folder
+
+```bash
+.
 ├── artifacts/
 │   ├── feature_scaler.pkl
 │   ├── food_recommendation_model.keras
