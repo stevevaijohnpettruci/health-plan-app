@@ -5,6 +5,7 @@ import { Layout } from './components/Layout'
 import { Dashboard } from './pages/Dashboard'
 import { Kebiasaan } from './pages/Kebiasaan'
 import { Rekomendasi } from './pages/Rekomendasi'
+import { RecipePage } from './pages/RecipePage'
 import { Progress } from './pages/Progress'
 import { Profil } from './pages/Profil'
 import { Notifikasi } from './pages/Notifikasi'
@@ -30,7 +31,6 @@ function AppRoutes() {
     )
   }
 
-  // Not authenticated - show auth pages
   if (!isAuthenticated) {
     return (
       <Routes>
@@ -41,7 +41,6 @@ function AppRoutes() {
     )
   }
 
-  // Authenticated but not completed onboarding
   if (onboardingStep && onboardingStep !== 'complete') {
     return (
       <Routes>
@@ -54,13 +53,13 @@ function AppRoutes() {
     )
   }
 
-  // Fully authenticated - show main app
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/kebiasaan" element={<Kebiasaan />} />
         <Route path="/rekomendasi" element={<Rekomendasi />} />
+        <Route path="/rekomendasi/resep/:id" element={<RecipePage />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/notifikasi" element={<Notifikasi />} />

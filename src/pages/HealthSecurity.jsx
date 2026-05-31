@@ -19,7 +19,7 @@ export const HealthSecurity = () => {
   const [loading, setLoading] = useState(false)
 
   const medicalOptions = ['Hypertension', 'Diabetes', 'Asthma', 'Cholesterol', 'Heart Disease', 'Other']
-  const commonAllergies = ['Peanuts', 'Gluten', 'Dairy', 'Eggs', 'Shellfish', 'Tree Nuts', 'Fish', 'Soy']
+  const commonAllergies = ['Peanuts', 'Gluten', 'Seafood', 'Egg', 'Milk', 'Soy']
 
   const handleMedicalChange = (condition) => {
     setFormData(prev => ({

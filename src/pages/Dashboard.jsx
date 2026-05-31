@@ -6,8 +6,6 @@ import {
   Tooltip, ResponsiveContainer,
 } from 'recharts'
 
-/* ── Reusable sub-components ─────────────────────────── */
-
 const MetricCard = ({ label, value, unit, sub, subColor = '#9CA3AF', barPct, barColor = '#F97316' }) => (
   <div style={{
     background: '#FFFFFF',
@@ -28,7 +26,7 @@ const MetricCard = ({ label, value, unit, sub, subColor = '#9CA3AF', barPct, bar
   </div>
 )
 
-const NutritionBar = ({ label, value, target = 100, color }) => {
+const NutritionBar = ({ label, value, target = 100, color, unit = 'g' }) => {
   const pct = Math.min(Math.round((value / target) * 100), 100)
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -36,10 +34,22 @@ const NutritionBar = ({ label, value, target = 100, color }) => {
       <div style={{ flex: 1, height: 7, borderRadius: 4, background: '#F5F5F5', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 4, transition: 'width 0.5s' }} />
       </div>
-      <div style={{ fontSize: 11, color: '#9CA3AF', width: 34, textAlign: 'right' }}>{pct}%</div>
+      <div style={{ fontSize: 11, color: '#9CA3AF', width: 56, textAlign: 'right', flexShrink: 0 }}>
+        {value}<span style={{ fontSize: 10 }}>{unit}</span>
+        <span style={{ color: '#D1D5DB', margin: '0 2px' }}>/</span>
+        {target}{unit}
+      </div>
     </div>
   )
 }
+
+const StreakCard = ({ icon, value, label }) => (
+  <div style={{ background: '#FFF7ED', borderRadius: 10, padding: '14px 12px', textAlign: 'center' }}>
+    <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>
+    <div style={{ fontSize: 24, fontWeight: 600, color: '#F97316', lineHeight: 1 }}>{value}</div>
+    <div style={{ fontSize: 11, color: '#C2410C', marginTop: 4 }}>{label}</div>
+  </div>
+)
 
 const HABIT_TYPE = {
   food:  { bg: '#FFF7ED', color: '#C2410C', label: 'Food' },
@@ -52,11 +62,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
     <div style={{
-      background: '#FFFFFF',
-      border: '1px solid #F0F0F0',
-      borderRadius: 8,
-      padding: '8px 12px',
-      fontSize: 12,
+      background: '#FFFFFF', border: '1px solid #F0F0F0',
+      borderRadius: 8, padding: '8px 12px', fontSize: 12,
       boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
     }}>
       <div style={{ color: '#9CA3AF', marginBottom: 2 }}>{label}</div>
@@ -65,14 +72,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   )
 }
 
-/* ── Main Dashboard ──────────────────────────────────── */
-
 const DEFAULT_HABITS = [
   { id: 1, name: 'Healthy breakfast',  time: '07:30', type: 'food',  completed: true  },
   { id: 2, name: 'Morning water',       time: '08:00', type: 'water', completed: true  },
   { id: 3, name: 'Morning workout',     time: '09:00', type: 'sport', completed: true  },
   { id: 4, name: 'Lunch meal',          time: '12:00', type: 'food',  completed: false },
-  { id: 5, name: 'Evening walk',        time: '17:00', type: 'sport', completed: false },
+  { id: 5, name: 'Makan malam',          time: '19:00', type: 'food',  completed: false },
   { id: 6, name: 'Sleep by 22:00',      time: '22:00', type: 'sleep', completed: false },
 ]
 
@@ -97,23 +102,27 @@ export const Dashboard = () => {
   const toggle = (id) =>
     setHabits(hs => hs.map(h => h.id === id ? { ...h, completed: !h.completed } : h))
 
-  const calories = dailyHealth?.calorieIntake ?? 1420
-  const calTarget = dailyHealth?.calorieTarget ?? 1800
-  const water = dailyHealth?.waterIntake ?? 5
-  const weight = dailyHealth?.weight ?? 68.0
-  const activity = dailyHealth?.activity ?? 3240
+  const water    = dailyHealth?.waterIntake ?? 5
+  const weight   = dailyHealth?.weight      ?? 68.0
+  const activity = dailyHealth?.activity    ?? 3240
+
+  /* ── Nutrition values (from dailyHealth or fallback) ── */
+  const nutrition = {
+    protein:     dailyHealth?.nutrition?.protein     ?? 76,
+    carbs:       dailyHealth?.nutrition?.carbs        ?? 210,
+    fiber:       dailyHealth?.nutrition?.fiber        ?? 18,
+    sugar:       dailyHealth?.nutrition?.sugar        ?? 32,
+    sodium:      dailyHealth?.nutrition?.sodium       ?? 1800,
+    cholesterol: dailyHealth?.nutrition?.cholesterol  ?? 180,
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* AI Banner */}
       <div style={{
-        background: '#F97316',
-        borderRadius: 12,
-        padding: '14px 18px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        background: '#F97316', borderRadius: 12, padding: '14px 18px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
@@ -135,14 +144,8 @@ export const Dashboard = () => {
         <button
           onClick={() => navigate('/rekomendasi')}
           style={{
-            background: '#FFFFFF',
-            color: '#C2410C',
-            border: 'none',
-            borderRadius: 8,
-            padding: '7px 14px',
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: 'pointer',
+            background: '#FFFFFF', color: '#C2410C', border: 'none',
+            borderRadius: 8, padding: '7px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
           }}
         >
           View plan →
@@ -150,7 +153,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Metric cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
         <MetricCard
           label="Weight"
           value={weight}
@@ -158,13 +161,6 @@ export const Dashboard = () => {
           sub="▼ 2.5 kg from start"
           subColor="#16A34A"
           barPct={Math.round((weight / 75) * 100)}
-        />
-        <MetricCard
-          label="Calories today"
-          value={calories.toLocaleString()}
-          unit="kcal"
-          sub={`Target ${calTarget.toLocaleString()} kcal`}
-          barPct={Math.round((calories / calTarget) * 100)}
         />
         <MetricCard
           label="Water intake"
@@ -200,10 +196,7 @@ export const Dashboard = () => {
               <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
               <Tooltip content={<CustomTooltip />} />
               <Line
-                type="monotone"
-                dataKey="weight"
-                stroke="#F97316"
-                strokeWidth={2.5}
+                type="monotone" dataKey="weight" stroke="#F97316" strokeWidth={2.5}
                 dot={{ fill: '#F97316', r: 4, strokeWidth: 0 }}
                 activeDot={{ r: 6, fill: '#F97316' }}
               />
@@ -230,12 +223,9 @@ export const Dashboard = () => {
                   onClick={() => toggle(h.id)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '8px 0',
-                    borderBottom: '1px solid #F9F9F9',
-                    cursor: 'pointer',
+                    padding: '8px 0', borderBottom: '1px solid #F9F9F9', cursor: 'pointer',
                   }}
                 >
-                  {/* Checkbox */}
                   <div style={{
                     width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
                     background: h.completed ? '#F97316' : 'transparent',
@@ -268,78 +258,56 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Nutrition + Calorie balance */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 14 }}>
+      {/* Nutrition + Streak & Consistency */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
 
-        {/* Nutrition bars */}
+        {/* Average water intake */}
         <div style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, padding: '16px 18px' }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>
-            Average nutrition achievement
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A' }}>
+              Average water intake
+            </div>
+            <span style={{ fontSize: 11, color: '#9CA3AF' }}>Daily targets</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
-            <NutritionBar label="Calories"     value={calories} target={calTarget} color="#F97316" />
-            <NutritionBar label="Protein"      value={76}  target={100} color="#FB923C" />
-            <NutritionBar label="Carbs"        value={91}  target={100} color="#FCD34D" />
-            <NutritionBar label="Fat"          value={68}  target={100} color="#FDBA74" />
-            <NutritionBar label="Fiber"        value={55}  target={100} color="#FED7AA" />
-            <NutritionBar label="Water intake" value={water} target={8} color="#38BDF8" />
+          <NutritionBar label="Water intake" value={water} target={8} color="#38BDF8" unit=" glass" />
+        </div>
+
+        {/* Streak & Consistency */}
+        <div style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, padding: '16px 18px' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 12 }}>Streak &amp; consistency</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <StreakCard icon="🔥" value={progressData?.streak?.consecutive ?? 6} label="Days in a row" />
+            <StreakCard icon="📅" value={progressData?.streak?.total       ?? 18} label="Total active days" />
+            <StreakCard icon="🏆" value={progressData?.streak?.longest     ?? 12} label="Longest streak" />
           </div>
         </div>
 
-        {/* Calorie balance + quick actions */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, padding: '14px 16px', flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 12 }}>Calorie balance</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A' }}>{calories.toLocaleString()}</div>
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>Calories in</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', color: '#9CA3AF', fontSize: 18 }}>−</div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A' }}>380</div>
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>Burned</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', color: '#9CA3AF', fontSize: 18 }}>=</div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 18, fontWeight: 600, color: '#F97316' }}>{(calories - 380).toLocaleString()}</div>
-                <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>Net</div>
-              </div>
-            </div>
-            <div style={{ height: 5, borderRadius: 3, background: '#F5F5F5', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.round((calories / calTarget) * 100)}%`, background: '#F97316', borderRadius: 3 }} />
-            </div>
-            <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 5, textAlign: 'right' }}>
-              {calTarget - calories} kcal remaining
-            </div>
-          </div>
+      </div>
 
-          {/* Quick actions */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-            <button
-              onClick={() => navigate('/kebiasaan')}
-              style={{
-                padding: '9px 14px', borderRadius: 9,
-                background: '#F9FAFB', border: '1px solid #F0F0F0',
-                fontSize: 12, fontWeight: 500, color: '#374151',
-                cursor: 'pointer', textAlign: 'center',
-              }}
-            >
-              Update today's habits
-            </button>
-            <button
-              onClick={() => navigate('/rekomendasi')}
-              style={{
-                padding: '9px 14px', borderRadius: 9,
-                background: '#F97316', border: 'none',
-                fontSize: 12, fontWeight: 600, color: '#FFFFFF',
-                cursor: 'pointer', textAlign: 'center',
-              }}
-            >
-              See today's recommendations →
-            </button>
-          </div>
-        </div>
+      {/* Quick actions */}
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button
+          onClick={() => navigate('/kebiasaan')}
+          style={{
+            flex: 1, padding: '9px 14px', borderRadius: 9,
+            background: '#F9FAFB', border: '1px solid #F0F0F0',
+            fontSize: 12, fontWeight: 500, color: '#374151',
+            cursor: 'pointer', textAlign: 'center',
+          }}
+        >
+          Update today's habits
+        </button>
+        <button
+          onClick={() => navigate('/rekomendasi')}
+          style={{
+            flex: 1, padding: '9px 14px', borderRadius: 9,
+            background: '#F97316', border: 'none',
+            fontSize: 12, fontWeight: 600, color: '#FFFFFF',
+            cursor: 'pointer', textAlign: 'center',
+          }}
+        >
+          See today's recommendations →
+        </button>
       </div>
 
       {/* Next reminders */}
@@ -347,17 +315,15 @@ export const Dashboard = () => {
         <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 12 }}>Next reminders</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {[
-            { dot: '#F97316', text: 'Lunch time!',         time: '12:00' },
-            { dot: '#3B82F6', text: 'Drink water',          time: '13:30' },
-            { dot: '#22C55E', text: 'Evening workout',      time: '17:00' },
-            { dot: '#A855F7', text: 'Prepare for sleep',    time: '21:30' },
+            { dot: '#F97316', text: 'Lunch time!',      time: '12:00' },
+            { dot: '#3B82F6', text: 'Drink water',       time: '13:30' },
+            { dot: '#22C55E', text: 'Evening workout',   time: '17:00' },
+            { dot: '#A855F7', text: 'Prepare for sleep', time: '21:30' },
           ].map(r => (
             <div key={r.text} style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              padding: '8px 12px',
-              background: '#F9FAFB',
-              border: '1px solid #F0F0F0',
-              borderRadius: 9,
+              padding: '8px 12px', background: '#F9FAFB',
+              border: '1px solid #F0F0F0', borderRadius: 9,
             }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: r.dot, flexShrink: 0 }} />
               <div style={{ flex: 1, fontSize: 12, color: '#374151' }}>{r.text}</div>

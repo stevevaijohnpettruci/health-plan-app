@@ -97,7 +97,7 @@ export const TopBar = () => {
 
         {/* Avatar */}
         <div
-          onClick={() => navigate('/profile')}
+          onClick={() => navigate('/profil')}
           style={{
             width: 34,
             height: 34,

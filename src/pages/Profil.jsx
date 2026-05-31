@@ -28,11 +28,11 @@ const Field = ({ label, children }) => (
 const inputStyle = (editing) => ({
   width: '100%',
   padding: '9px 12px',
-  border: `1.5px solid ${editing ? '#F97316' : '#F0F0F0'}`,
+  border: `1.5px solid ${editing ? '#F97316' : '#E5E7EB'}`,
   borderRadius: 8,
   fontSize: 13,
-  color: editing ? '#1A1A1A' : '#6B7280',
-  background: editing ? '#FFFFFF' : '#FAFAFA',
+  color: '#1A1A1A',
+  background: editing ? '#FFFFFF' : '#F9FAFB',
   outline: 'none',
   cursor: editing ? 'text' : 'not-allowed',
   boxSizing: 'border-box',
@@ -75,12 +75,8 @@ export const Profil = () => {
 
       {/* Header banner */}
       <div style={{
-        background: '#F97316',
-        borderRadius: 12,
-        padding: '20px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        background: '#F97316', borderRadius: 12, padding: '20px 24px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{
@@ -107,11 +103,7 @@ export const Profil = () => {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            style={{
-              padding: '8px 18px', borderRadius: 8,
-              background: '#fff', border: 'none',
-              color: '#C2410C', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            }}
+            style={{ padding: '8px 18px', borderRadius: 8, background: '#fff', border: 'none', color: '#C2410C', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
           >
             Edit Profile
           </button>
@@ -119,23 +111,15 @@ export const Profil = () => {
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={handleCancel}
-              style={{
-                padding: '8px 16px', borderRadius: 8,
-                background: 'rgba(255,255,255,0.2)', border: 'none',
-                color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer',
-              }}
+              style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
             >
-              Batal
+              Cancel
             </button>
             <button
               onClick={handleSave}
-              style={{
-                padding: '8px 18px', borderRadius: 8,
-                background: '#fff', border: 'none',
-                color: '#C2410C', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              }}
+              style={{ padding: '8px 18px', borderRadius: 8, background: '#fff', border: 'none', color: '#C2410C', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
             >
-              Simpan
+              Save
             </button>
           </div>
         )}
@@ -144,10 +128,10 @@ export const Profil = () => {
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
         {[
-          { label: 'Berat Badan', value: `${userProfile?.weight} kg` },
-          { label: 'Tinggi Badan', value: `${userProfile?.height} cm` },
-          { label: 'Usia', value: `${userProfile?.age} tahun` },
-          { label: 'Target Berat', value: `${userProfile?.targetWeight} kg` },
+          { label: 'Weight',        value: `${userProfile?.weight} kg` },
+          { label: 'Height',        value: `${userProfile?.height} cm` },
+          { label: 'Age',           value: `${userProfile?.age} years` },
+          { label: 'Target Weight', value: `${userProfile?.targetWeight} kg` },
         ].map(({ label, value }) => (
           <div key={label} style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, padding: '14px 16px' }}>
             <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>{label}</div>
@@ -166,17 +150,12 @@ export const Profil = () => {
               key={key}
               onClick={() => setActiveTab(key)}
               style={{
-                padding: '14px 18px',
-                fontSize: 13,
+                padding: '14px 18px', fontSize: 13,
                 fontWeight: activeTab === key ? 600 : 400,
                 color: activeTab === key ? '#F97316' : '#9CA3AF',
-                background: 'none',
-                border: 'none',
+                background: 'none', border: 'none',
                 borderBottom: activeTab === key ? '2px solid #F97316' : '2px solid transparent',
-                cursor: 'pointer',
-                marginBottom: -1,
-                transition: 'all 0.15s',
-                whiteSpace: 'nowrap',
+                cursor: 'pointer', marginBottom: -1, transition: 'all 0.15s', whiteSpace: 'nowrap',
               }}
             >
               {label}
@@ -184,32 +163,31 @@ export const Profil = () => {
           ))}
         </div>
 
-        {/* Tab content */}
         <div style={{ padding: '20px 24px' }}>
 
           {/* General */}
           {activeTab === 'general' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>Informasi Dasar</div>
-                <Field label="Nama Lengkap">
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>Basic Information</div>
+                <Field label="Full Name">
                   <input type="text" name="fullName" value={formData?.fullName || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
                 </Field>
                 <Field label="Email">
                   <input type="email" name="email" value={formData?.email || ''} disabled style={inputStyle(false)} />
-                  <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Email tidak dapat diubah</div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>Email cannot be changed</div>
                 </Field>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>Data Biometrik</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>Biometric Data</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <Field label="Usia">
+                  <Field label="Age">
                     <input type="number" name="age" value={formData?.age || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
                   </Field>
-                  <Field label="Jenis Kelamin">
+                  <Field label="Gender">
                     <select name="gender" value={formData?.gender || 'Male'} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)}>
-                      <option value="Male">Laki-laki</option>
-                      <option value="Female">Perempuan</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
                     </select>
                   </Field>
                 </div>
@@ -219,37 +197,124 @@ export const Profil = () => {
 
           {/* Health */}
           {activeTab === 'health' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+              {/* Body Measurements */}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Pengukuran Tubuh</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Body Measurements</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <Field label="Berat Badan (kg)">
-                    <input type="number" name="weight" step="0.1" value={formData?.weight || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
+                  <Field label="Weight (kg)">
+                    <input
+                      type="number" name="weight" step="0.1"
+                      value={formData?.weight || ''}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      style={inputStyle(isEditing)}
+                    />
                   </Field>
-                  <Field label="Tinggi Badan (cm)">
-                    <input type="number" name="height" value={formData?.height || ''} onChange={handleChange} disabled={!isEditing} style={inputStyle(isEditing)} />
+                  <Field label="Height (cm)">
+                    <input
+                      type="number" name="height"
+                      value={formData?.height || ''}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      style={inputStyle(isEditing)}
+                    />
                   </Field>
                 </div>
               </div>
+
+              {/* Vital Signs */}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Informasi Kesehatan</div>
-                <InfoRow label="Riwayat Medis" value={userProfile?.medicalHistory?.length > 0 ? userProfile.medicalHistory.join(', ') : 'Tidak ada'} />
-                <InfoRow label="Alergi" value={userProfile?.allergies?.length > 0 ? userProfile.allergies.join(', ') : 'Tidak ada'} />
-                <InfoRow label="Tekanan Darah" value={userProfile?.bloodPressure?.systolic ? `${userProfile.bloodPressure.systolic}/${userProfile.bloodPressure.diastolic} mmHg` : '-'} />
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Vital Signs</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                  <div style={{ background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 10, padding: '12px 16px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>Blood Pressure</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: '#1A1A1A' }}>
+                      {userProfile?.bloodPressure?.systolic
+                        ? `${userProfile.bloodPressure.systolic}/${userProfile.bloodPressure.diastolic}`
+                        : '-'}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>mmHg</div>
+                  </div>
+                  <div style={{ background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 10, padding: '12px 16px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>Heart Rate</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: '#1A1A1A' }}>
+                      {userProfile?.heartRate || '-'}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>bpm</div>
+                  </div>
+                  <div style={{ background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 10, padding: '12px 16px' }}>
+                    <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>BMI</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: '#1A1A1A' }}>
+                      {userProfile?.bmi?.toFixed(1) || '-'}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 2 }}>{userProfile?.bmiCategory || ''}</div>
+                  </div>
+                </div>
               </div>
+
+              {/* Medical History */}
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>Medical History</div>
+                {userProfile?.medicalHistory?.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {userProfile.medicalHistory.map(item => (
+                      <span key={item} style={{ padding: '4px 12px', borderRadius: 99, background: '#FFF7ED', color: '#C2410C', fontSize: 12, fontWeight: 500 }}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 13, color: '#9CA3AF', padding: '10px 0', borderBottom: '1px solid #F5F5F5' }}>No medical history recorded</div>
+                )}
+              </div>
+
+              {/* Allergies */}
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>Food Allergies</div>
+                {userProfile?.allergies?.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {userProfile.allergies.map(item => (
+                      <span key={item} style={{ padding: '4px 12px', borderRadius: 99, background: '#FEF2F2', color: '#DC2626', fontSize: 12, fontWeight: 500 }}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 13, color: '#9CA3AF', padding: '10px 0', borderBottom: '1px solid #F5F5F5' }}>No allergies recorded</div>
+                )}
+              </div>
+
+              {/* Physical Injury & Medication */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>Physical Injury History</div>
+                  <div style={{ fontSize: 13, color: userProfile?.physicalInjuries ? '#1A1A1A' : '#9CA3AF', padding: '10px 14px', background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 8, minHeight: 60 }}>
+                    {userProfile?.physicalInjuries || 'None recorded'}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>Current Medication</div>
+                  <div style={{ fontSize: 13, color: userProfile?.currentMedication ? '#1A1A1A' : '#9CA3AF', padding: '10px 14px', background: '#F9FAFB', border: '1px solid #F0F0F0', borderRadius: 8, minHeight: 60 }}>
+                    {userProfile?.currentMedication || 'None recorded'}
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
 
           {/* Lifestyle */}
           {activeTab === 'lifestyle' && (
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Gaya Hidup</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Lifestyle</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                <InfoRow label="Pola Makan" value={userProfile?.dietaryPattern} />
-                <InfoRow label="Frekuensi Makan" value={userProfile?.mealsPerDay ? `${userProfile.mealsPerDay} kali/hari` : '-'} />
-                <InfoRow label="Target Air Minum" value={userProfile?.dailyWaterIntakeGoal ? `${userProfile.dailyWaterIntakeGoal} ml/hari` : '-'} />
-                <InfoRow label="Jam Tidur Rata-rata" value={userProfile?.avgSleepHours ? `${userProfile.avgSleepHours} jam` : '-'} />
-                <InfoRow label="Tingkat Aktivitas" value={userProfile?.activityLevel} />
+                <InfoRow label="Dietary Pattern"    value={userProfile?.dietaryPattern} />
+                <InfoRow label="Meals per Day"      value={userProfile?.mealsPerDay ? `${userProfile.mealsPerDay} times/day` : '-'} />
+                <InfoRow label="Daily Water Goal"   value={userProfile?.dailyWaterIntakeGoal ? `${userProfile.dailyWaterIntakeGoal} ml/day` : '-'} />
+                <InfoRow label="Avg Sleep Hours"    value={userProfile?.avgSleepHours ? `${userProfile.avgSleepHours} hours` : '-'} />
+                <InfoRow label="Activity Level"     value={userProfile?.activityLevel} />
               </div>
             </div>
           )}
@@ -258,21 +323,21 @@ export const Profil = () => {
           {activeTab === 'goals' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Tujuan Kesehatan</div>
-                <InfoRow label="Tujuan Utama" value={userProfile?.primaryGoal} />
-                <InfoRow label="Target Berat Badan" value={userProfile?.targetWeight ? `${userProfile.targetWeight} kg` : '-'} />
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Health Goals</div>
+                <InfoRow label="Primary Goal"         value={userProfile?.primaryGoal} />
+                <InfoRow label="Target Weight"        value={userProfile?.targetWeight ? `${userProfile.targetWeight} kg` : '-'} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F5F5F5' }}>
-                  <span style={{ fontSize: 13, color: '#9CA3AF' }}>Selisih Target</span>
+                  <span style={{ fontSize: 13, color: '#9CA3AF' }}>Weight Difference</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#F97316' }}>
                     {userProfile?.weight && userProfile?.targetWeight ? `${(userProfile.weight - userProfile.targetWeight).toFixed(1)} kg` : '-'}
                   </span>
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Komitmen</div>
-                <InfoRow label="Olahraga Per Minggu" value={userProfile?.commitmentDays ? `${userProfile.commitmentDays} hari` : '-'} />
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Commitment</div>
+                <InfoRow label="Exercise per Week" value={userProfile?.commitmentDays ? `${userProfile.commitmentDays} days` : '-'} />
                 <div style={{ padding: '10px 0' }}>
-                  <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 8 }}>Aktivitas Pilihan</div>
+                  <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 8 }}>Preferred Activities</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {userProfile?.preferredActivities?.map(activity => (
                       <span key={activity} style={{
@@ -293,12 +358,12 @@ export const Profil = () => {
           {activeTab === 'settings' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Akun</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 14 }}>Account</div>
                 <InfoRow label="Email" value={userProfile?.email} />
-                <InfoRow label="Bergabung" value={userProfile?.registeredAt ? new Date(userProfile.registeredAt).toLocaleDateString('id-ID') : '-'} />
+                <InfoRow label="Joined" value={userProfile?.registeredAt ? new Date(userProfile.registeredAt).toLocaleDateString('en-US') : '-'} />
               </div>
               <div style={{ borderTop: '1px solid #F0F0F0', paddingTop: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#EF4444', marginBottom: 12 }}>Zona Bahaya</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#EF4444', marginBottom: 12 }}>Danger Zone</div>
                 <button
                   onClick={handleLogout}
                   style={{
