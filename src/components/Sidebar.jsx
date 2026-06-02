@@ -81,30 +81,21 @@ export const Sidebar = () => {
     }}>
       {/* Logo */}
       <div style={{
-        padding: '20px 18px 16px',
+        padding: '14px 18px',
         borderBottom: '1px solid #F0F0F0',
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        justifyContent: 'center',
       }}>
-        <div style={{
-          width: 34,
-          height: 34,
-          borderRadius: 10,
-          background: '#F97316',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-          </svg>
-        </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.2 }}>HealthPlan</div>
-          <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>DBS Foundation</div>
-        </div>
+        <img
+          src="/logo.png"
+          alt="HealthPlan"
+          style={{
+            width: 110,
+            height: 'auto',
+            objectFit: 'contain',
+          }}
+        />
       </div>
 
       {/* Nav */}

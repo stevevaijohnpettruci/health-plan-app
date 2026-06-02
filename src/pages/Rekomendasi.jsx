@@ -234,15 +234,26 @@ const MEAL_DATA = [
 ]
 
 /* ── Meal Card ─────────────────────────────────────────── */
-const MealCard = ({ meal, onViewRecipe }) => {
+const MealCard = ({ meal, onClick }) => {
   const tags = generateTags(meal.nutrition)
-  const n = meal.nutrition || {}
+  const n    = meal.nutrition || {}
 
   return (
     <div
-      style={{ background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'box-shadow 0.15s' }}
-      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'}
-      onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+      onClick={() => onClick(meal)}
+      style={{
+        background: '#FFFFFF', border: '1px solid #F0F0F0', borderRadius: 12,
+        overflow: 'hidden', display: 'flex', flexDirection: 'column',
+        cursor: 'pointer', transition: 'box-shadow 0.15s, transform 0.15s',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.10)'
+        e.currentTarget.style.transform = 'translateY(-2px)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.boxShadow = 'none'
+        e.currentTarget.style.transform = 'translateY(0)'
+      }}
     >
       {/* Image / emoji banner */}
       {meal.image_url ? (
@@ -313,15 +324,15 @@ const MealCard = ({ meal, onViewRecipe }) => {
           </div>
         )}
 
-        {/* View recipe button */}
-        <button
-          onClick={() => onViewRecipe(meal)}
-          style={{ marginTop: 'auto', padding: '8px', borderRadius: 8, background: '#F97316', border: 'none', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', width: '100%' }}
-          onMouseEnter={e => e.currentTarget.style.background = '#EA6C00'}
-          onMouseLeave={e => e.currentTarget.style.background = '#F97316'}
-        >
+        {/* CTA */}
+        <div style={{
+          marginTop: 'auto', padding: '8px', borderRadius: 8,
+          background: '#FFF7ED', border: '1px solid #FED7AA',
+          color: '#C2410C', fontSize: 12, fontWeight: 600,
+          textAlign: 'center',
+        }}>
           View full recipe →
-        </button>
+        </div>
       </div>
     </div>
   )
@@ -329,7 +340,7 @@ const MealCard = ({ meal, onViewRecipe }) => {
 
 /* ── Main Rekomendasi ──────────────────────────────────── */
 export const Rekomendasi = () => {
-  const navigate = useNavigate()
+  const navigate    = useNavigate()
   const [refreshing, setRefreshing] = useState(false)
 
   const handleRefresh = () => {
@@ -337,7 +348,7 @@ export const Rekomendasi = () => {
     setTimeout(() => setRefreshing(false), 1500)
   }
 
-  const handleViewRecipe = (meal) => {
+  const handleCardClick = (meal) => {
     navigate(`/rekomendasi/resep/${meal.id}`, { state: { meal } })
   }
 
@@ -367,12 +378,14 @@ export const Rekomendasi = () => {
       {/* Header */}
       <div>
         <div style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>Meal Plan</div>
-        <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 2 }}>Today's recommended meals based on your health profile</div>
+        <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 2 }}>Click any meal to see the full recipe</div>
       </div>
 
       {/* Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
-        {MEAL_DATA.map(m => <MealCard key={m.id} meal={m} onViewRecipe={handleViewRecipe} />)}
+        {MEAL_DATA.map(m => (
+          <MealCard key={m.id} meal={m} onClick={handleCardClick} />
+        ))}
       </div>
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

@@ -77,7 +77,7 @@ const DEFAULT_HABITS = [
   { id: 2, name: 'Morning water',       time: '08:00', type: 'water', completed: true  },
   { id: 3, name: 'Morning workout',     time: '09:00', type: 'sport', completed: true  },
   { id: 4, name: 'Lunch meal',          time: '12:00', type: 'food',  completed: false },
-  { id: 5, name: 'Makan malam',          time: '19:00', type: 'food',  completed: false },
+  { id: 5, name: 'Healthy Dinner',          time: '19:00', type: 'food',  completed: false },
   { id: 6, name: 'Sleep by 22:00',      time: '22:00', type: 'sleep', completed: false },
 ]
 

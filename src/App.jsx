@@ -8,7 +8,6 @@ import { Rekomendasi } from './pages/Rekomendasi'
 import { RecipePage } from './pages/RecipePage'
 import { Progress } from './pages/Progress'
 import { Profil } from './pages/Profil'
-import { Notifikasi } from './pages/Notifikasi'
 import { Register } from './pages/Register'
 import { Login } from './pages/Login'
 import { BasicIdentity } from './pages/BasicIdentity'
@@ -62,7 +61,6 @@ function AppRoutes() {
         <Route path="/rekomendasi/resep/:id" element={<RecipePage />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/profil" element={<Profil />} />
-        <Route path="/notifikasi" element={<Notifikasi />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
