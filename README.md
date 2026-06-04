@@ -36,18 +36,23 @@ Dataset terdiri dari 4 file CSV:
 ### recipes.csv
 - Ukuran 522,517 baris x 27 kolom
 - File .csv mentah yang diambil langsung dari Kaggle.
+- Source: https://www.kaggle.com/datasets/irkaal/foodcom-recipes-and-reviews?select=recipes.csv
+- Link: https://drive.google.com/file/d/1g4PmMZjmPjT_5WOSZ7V8APUkXzj6rAy9/view?usp=sharing
 
 ### recipes_cleaned.csv
 - Ukuran 264,850 x 22 kolom
 - File .csv yang telah dibersihkan dan siap diproses lebih lanjut oleh tim AI.
+- Link: https://drive.google.com/file/d/1AIpa2G3wkdhNNWY9JgK9guiXeehQZwgH/view?usp=sharing
 
 ### synthetic_healthplan_users.csv
 - Ukuran 10,000 baris x 21 kolom 32
 - File sintetis yang dibuat sesuai instruksi tim AI, guna kebutuhan pelatihan model.
+- Link: https://drive.google.com/file/d/1rZexLOM6crsp84yu59px0ZxYDUBFT27j/view?usp=sharing
 
 ### synthetic_healthplan_users_eda.csv
 - Ukuran 10,000 baris x 32 kolom
 - File siap digunakan untuk proses EDA lanjut dan modelling oleh tim AI.
+- Link: https://drive.google.com/file/d/12LFkMqANJYeMRmzriS3pWDB_sQSfrKT-/view?usp=sharing
 
 ---
 
@@ -67,7 +72,7 @@ pip install -r requirements.txt
 ### Langkah 2: Jalankan Notebook (Analisis Lengkap)
 
 ```bash
-jupyter notebook notebook.ipynb
+jupyter notebook EDA Final.ipynb
 ```
 
 ### Langkah 3: Jalankan Dashboard Interaktif
