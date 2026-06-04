@@ -1,6 +1,10 @@
+
+
 # HealthPlan AI Recommendation System
 
 HealthPlan AI Recommendation System is a deep learning–based personalized food recommendation system developed using TensorFlow Functional API and custom training loop with `tf.GradientTape`.
+
+Notebook Link: https://drive.google.com/file/d/1AAe7VAEtLJ7Xu8XzESgNAgqXQRr3Oymp/view?usp=sharing
 
 This project focuses on generating personalized healthy food recommendations based on:
 
