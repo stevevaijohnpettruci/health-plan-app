@@ -4,8 +4,8 @@ import {
   editGoalSettingByUserId,
 } from '../controller/goals_setting-controller.js';
 import { Router } from 'express';
-import authenticateToken from '../../../middlewares/auth.js';
-import validate from '../../../middlewares/validate.js';
+import authenticateToken from '../../../middleware/auth.js';
+import { validate } from '../../../middleware/validate.js';
 import {
   createGoalSettingSchema,
   updateGoalSettingSchema,
@@ -19,9 +19,9 @@ router.post(
   validate(createGoalSettingSchema),
   addGoalSetting,
 );
-router.get('/:user_id', authenticateToken, getGoalSettingByUserId);
+router.get('/', authenticateToken, getGoalSettingByUserId);
 router.put(
-  '/:user_id',
+  '/',
   authenticateToken,
   validate(updateGoalSettingSchema),
   editGoalSettingByUserId,

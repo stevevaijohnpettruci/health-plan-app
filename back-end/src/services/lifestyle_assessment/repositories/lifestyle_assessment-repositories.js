@@ -1,50 +1,41 @@
 import { Pool } from 'pg';
 import { nanoid } from 'nanoid';
 
-class LifestyleAssessmentRepositories {
+class LifestyleAssessmentRepository {
   constructor() {
     this.pool = new Pool();
   }
-  
-  async addLifeStyleAssesment({
-    dietary_pattern,
-    meals_per_day,
-    daily_water_intake_goal,
-    avg_sleep_hours,
-    smoking_habits,
-    user_id,
-  }) {
-    const id = nanoid(16);
 
-    const createdAt = new Date().toISOString();
-    const updatedAt = new Date().toISOString();
+  async addLifestyleAssessment({
+    dietaryPattern,
+    mealsPerDay,
+    dailyWaterIntakeGoal,
+    avgSleepHours,
+    userId,
+  }) {
+    // Menambahkan prefix 'lsa-' agar seragam dan mudah diidentifikasi
+    const id = `lsa-${nanoid(16)}`;
 
     const query = {
       text: `
-        INSERT INTO lifestyle_assessment(
+        INSERT INTO lifestyle_assessments (
           id,
           user_id,
           dietary_pattern,
           meals_per_day,
           daily_water_intake_goal,
-          avg_sleep_hours,
-          smoking_habits,
-          created_at,
-          updated_at
+          avg_sleep_hours
         )
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id
       `,
       values: [
         id,
-        user_id,
-        dietary_pattern,
-        meals_per_day,
-        daily_water_intake_goal,
-        avg_sleep_hours,
-        smoking_habits,
-        createdAt,
-        updatedAt,
+        userId,
+        dietaryPattern,
+        mealsPerDay,
+        dailyWaterIntakeGoal,
+        avgSleepHours,
       ],
     };
 
@@ -52,49 +43,38 @@ class LifestyleAssessmentRepositories {
     return result.rows[0];
   }
 
-  async getLifeStyleAssesmentByUserId(user_id) {
+  async getLifestyleAssessmentByUserId(userId) {
     const query = {
-      text: 'SELECT * FROM lifestyle_assessment WHERE user_id = $1',
-      values: [user_id],
+      text: 'SELECT * FROM lifestyle_assessments WHERE user_id = $1',
+      values: [userId],
     };
 
     const result = await this.pool.query(query);
     return result.rows[0];
   }
 
-  async editLifeStyleAssesmentByUserId(
-    user_id,
-    {
-      dietary_pattern,
-      meals_per_day,
-      daily_water_intake_goal,
-      avg_sleep_hours,
-      smoking_habits,
-    },
+  async editLifestyleAssessmentByUserId(
+    userId,
+    { dietaryPattern, mealsPerDay, dailyWaterIntakeGoal, avgSleepHours },
   ) {
-    const updatedAt = new Date().toISOString();
-
     const query = {
       text: `
-        UPDATE lifestyle_assessment
+        UPDATE lifestyle_assessments
         SET
           dietary_pattern = $1,
           meals_per_day = $2,
           daily_water_intake_goal = $3,
           avg_sleep_hours = $4,
-          smoking_habits = $5,
-          updated_at = $6
-        WHERE user_id = $7
+          updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = $5
         RETURNING *
       `,
       values: [
-        dietary_pattern,
-        meals_per_day,
-        daily_water_intake_goal,
-        avg_sleep_hours,
-        smoking_habits,
-        updatedAt,
-        user_id,
+        dietaryPattern,
+        mealsPerDay,
+        dailyWaterIntakeGoal,
+        avgSleepHours,
+        userId,
       ],
     };
 
@@ -103,4 +83,4 @@ class LifestyleAssessmentRepositories {
   }
 }
 
-export default LifestyleAssessmentRepositories;
+export default new LifestyleAssessmentRepository();

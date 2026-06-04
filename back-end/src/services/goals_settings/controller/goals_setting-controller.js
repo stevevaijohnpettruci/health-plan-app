@@ -1,89 +1,106 @@
-import GoalSettingRepositories from '../repositories/goals_setting-repositories.js';
+import GoalSettingRepository from '../repositories/goals_setting-repositories.js';
 import InvariantError from '../../../exceptions/invariant-error.js';
 import NotFoundError from '../../../exceptions/not-found-error.js';
 import response from '../../../utils/response.js';
 
 export const addGoalSetting = async (req, res, next) => {
-  const {
-    user_id,
-    primary_goal,
-    target_weight_kg,
-    commitment_days,
-    preferred_activity,
-  } = req.validated;
+  try {
+    const userId = req.user.id;
+    const {
+      primary_goal: primaryGoal,
+      target_weight_kg: targetWeightKg,
+      commitment_days: commitmentDays,
+      preferred_activity: preferredActivity,
+    } = req.validated;
 
-  const isUserExist =
-    await GoalSettingRepositories.getGoalSettingByUserId(user_id);
+    const existingGoal =
+      await GoalSettingRepository.getGoalSettingByUserId(userId);
 
-  if (isUserExist) {
-    return next(
-      new InvariantError(
-        'Gagal menambahkan goal setting. User sudah memiliki goal setting.',
-      ),
-    );
+    if (existingGoal) {
+      return next(
+        new InvariantError(
+          'Failed to add goal setting. User already has a goal setting.',
+        ),
+      );
+    }
+
+    const goalSettingId = await GoalSettingRepository.addGoalSetting({
+      userId,
+      primaryGoal,
+      targetWeightKg,
+      commitmentDays,
+      preferredActivity,
+    });
+
+    if (!goalSettingId) {
+      return next(new InvariantError('Failed to add goal setting.'));
+    }
+
+    return response(res, 201, 'Goal setting successfully added', {
+      id: goalSettingId,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const goalSetting = await GoalSettingRepositories.addGoalSetting({
-    user_id,
-    primary_goal,
-    target_weight_kg,
-    commitment_days,
-    preferred_activity,
-  });
-
-  if (!goalSetting) {
-    return next(new InvariantError('Gagal menambahkan goal setting.'));
-  }
-
-  return response(res, 201, 'Goal setting berhasil ditambahkan', {
-    id: goalSetting,
-  });
+  // Map snake_case to camelCase
 };
 
 export const getGoalSettingByUserId = async (req, res, next) => {
-  const { user_id } = req.params;
+  try {
+    const userId = req.user.id;
 
-  const goalSetting =
-    await GoalSettingRepositories.getGoalSettingByUserId(user_id);
+    const goalSetting =
+      await GoalSettingRepository.getGoalSettingByUserId(userId);
 
-  if (!goalSetting) {
-    return next(new NotFoundError('Goal setting tidak ditemukan.'));
+    if (!goalSetting) {
+      return next(new NotFoundError('Goal setting not found.'));
+    }
+
+    return response(res, 200, 'Goal setting successfully retrieved', {
+      goalSetting,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  return response(res, 200, 'Goal setting berhasil ditampilkan', {
-    goalSetting,
-  });
 };
 
 export const editGoalSettingByUserId = async (req, res, next) => {
-  const { user_id } = req.params;
-  const {
-    primary_goal,
-    target_weight_kg,
-    commitment_days,
-    preferred_activity,
-  } = req.validated;
+  try {
+    const userId = req.user.id;
 
-  const goalSetting =
-    await GoalSettingRepositories.getGoalSettingByUserId(user_id);
+    // Map snake_case to camelCase
+    const {
+      primary_goal: primaryGoal,
+      target_weight_kg: targetWeightKg,
+      commitment_days: commitmentDays,
+      preferred_activity: preferredActivity,
+    } = req.validated;
 
-  if (!goalSetting) {
-    return next(new NotFoundError('Goal setting tidak ditemukan.'));
-  }
+    // Fetch the existing record to get its Primary Key (id)
+    const existingGoal =
+      await GoalSettingRepository.getGoalSettingByUserId(userId);
 
-  const updatedGoalSetting =
-    await GoalSettingRepositories.updateGoalSettingByUserId(user_id, {
-      primary_goal,
-      target_weight_kg,
-      commitment_days,
-      preferred_activity,
+    if (!existingGoal) {
+      return next(new NotFoundError('Goal setting not found.'));
+    }
+
+    // Use the extracted 'id' to perform the update
+    const updatedGoalSettingId =
+      await GoalSettingRepository.updateGoalSettingById(existingGoal.id, {
+        primaryGoal,
+        targetWeightKg,
+        commitmentDays,
+        preferredActivity,
+      });
+
+    if (!updatedGoalSettingId) {
+      return next(new InvariantError('Failed to update goal setting.'));
+    }
+
+    return response(res, 200, 'Goal setting successfully updated', {
+      id: updatedGoalSettingId,
     });
-
-  if (!updatedGoalSetting) {
-    return next(new InvariantError('Gagal memperbarui goal setting.'));
+  } catch (error) {
+    next(error);
   }
-
-  return response(res, 200, 'Goal setting berhasil diperbarui', {
-    id: updatedGoalSetting,
-  });
 };

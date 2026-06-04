@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { nanoid } from 'nanoid';
 
-class HealthSecurityRepositories {
+class HealthSecurityRepository {
   constructor() {
     this.pool = new Pool();
   }
@@ -16,12 +16,10 @@ class HealthSecurityRepositories {
     allergy,
   }) {
     const id = `health-${nanoid(16)}`;
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
 
     const query = {
       text: `
-        INSERT INTO health_security (
+        INSERT INTO health_securities (
           id,
           user_id,
           medical_history,
@@ -29,13 +27,10 @@ class HealthSecurityRepositories {
           current_medication,
           blood_pressure,
           heart_rate,
-          allergy,
-          created_at,
-          updated_at
+          allergy
         )
         VALUES (
-          $1, $2, $3, $4, $5,
-          $6, $7, $8, $9, $10
+          $1, $2, $3, $4, $5, $6, $7, $8
         )
         RETURNING id
       `,
@@ -48,13 +43,10 @@ class HealthSecurityRepositories {
         bloodPressure,
         heartRate,
         allergy,
-        createdAt,
-        updatedAt,
       ],
     };
 
     const result = await this.pool.query(query);
-
     return result.rows[0].id;
   }
 
@@ -72,15 +64,15 @@ class HealthSecurityRepositories {
           allergy,
           created_at,
           updated_at
-        FROM health_security
+        FROM health_securities
         WHERE user_id = $1
       `,
       values: [userId],
     };
 
     const result = await this.pool.query(query);
-
-    return result.rows;
+    // Mengembalikan objek tunggal, bukan array
+    return result.rows[0];
   }
 
   async getHealthSecurityById(id) {
@@ -97,14 +89,13 @@ class HealthSecurityRepositories {
           allergy,
           created_at,
           updated_at
-        FROM health_security
+        FROM health_securities
         WHERE id = $1
       `,
       values: [id],
     };
 
     const result = await this.pool.query(query);
-
     return result.rows[0];
   }
 
@@ -119,11 +110,9 @@ class HealthSecurityRepositories {
       allergy,
     },
   ) {
-    const updatedAt = new Date().toISOString();
-
     const query = {
       text: `
-        UPDATE health_security
+        UPDATE health_securities
         SET
           medical_history = $1,
           physical_injuries = $2,
@@ -131,8 +120,8 @@ class HealthSecurityRepositories {
           blood_pressure = $4,
           heart_rate = $5,
           allergy = $6,
-          updated_at = $7
-        WHERE id = $8
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $7
         RETURNING id
       `,
       values: [
@@ -142,15 +131,13 @@ class HealthSecurityRepositories {
         bloodPressure,
         heartRate,
         allergy,
-        updatedAt,
         id,
       ],
     };
 
     const result = await this.pool.query(query);
-
     return result.rows[0];
   }
 }
 
-export default HealthSecurityRepositories;
+export default new HealthSecurityRepository();

@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-import bcrypt from 'bcrypt';
 
 class AuthenticationRepositories {
   constructor() {
@@ -8,31 +7,11 @@ class AuthenticationRepositories {
 
   async addRefreshToken(token) {
     const query = {
-      text: 'INSERT INTO authentications VALUES($1)',
+      text: 'INSERT INTO authentications (token) VALUES ($1)',
       values: [token],
     };
 
     await this.pool.query(query);
-  }
-
-  async verifyUserCredential(email, password) {
-    const query = {
-      text: 'SELECT id, password FROM users WHERE email = $1',
-      values: [email],
-    };
-
-    const result = await this.pool.query(query);
-    if (result.rows.length === 0) {
-      return null;
-    }
-
-    const { id, password: hashedPassword } = result.rows[0];
-    const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
-
-    if (!isPasswordMatch) {
-      return null;
-    }
-    return id;
   }
 
   async deleteRefreshToken(token) {
@@ -40,6 +19,7 @@ class AuthenticationRepositories {
       text: 'DELETE FROM authentications WHERE token = $1',
       values: [token],
     };
+
     await this.pool.query(query);
   }
 
@@ -50,7 +30,8 @@ class AuthenticationRepositories {
     };
 
     const result = await this.pool.query(query);
-    if (!result.rows.length) {
+
+    if (result.rowCount === 0) {
       return false;
     }
 

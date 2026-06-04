@@ -1,82 +1,111 @@
-import BasicIdentityRepositories from '../repositories/basic_identity-repositories.js';
+import BasicIdentityRepository from '../repositories/basic_identity-repositories.js';
 import InvariantError from '../../../exceptions/invariant-error.js';
 import NotFoundError from '../../../exceptions/not-found-error.js';
 import response from '../../../utils/response.js';
 
 export const addUserBasicIdentity = async (req, res, next) => {
-  const { user_id, age, gender, weight, height, activity_level } =
-    req.validated;
+  try {
+    const userId = req.user.id;
 
-  const isUserExist =
-    await BasicIdentityRepositories.getUserBasicIdentityByUserId(user_id);
-
-  if (isUserExist) {
-    return next(
-      new InvariantError(
-        'Gagal menambahkan basic identity. User sudah memiliki basic identity.',
-      ),
-    );
-  }
-
-  const userBasicIdentity =
-    await BasicIdentityRepositories.addUserBasicIdentity({
-      user_id,
+    const {
       age,
       gender,
       weight,
       height,
-      activity_level,
+      activity_level: activityLevel,
+    } = req.validated;
+
+    const isUserExist =
+      await BasicIdentityRepository.getUserBasicIdentityByUserId(userId);
+
+    if (isUserExist) {
+      return next(
+        new InvariantError(
+          'Failed to add basic identity. User already has a basic identity profile.',
+        ),
+      );
+    }
+
+    const userBasicIdentity =
+      await BasicIdentityRepository.addUserBasicIdentity({
+        userId,
+        age,
+        gender,
+        weight,
+        height,
+        activityLevel,
+      });
+
+    if (!userBasicIdentity) {
+      return next(new InvariantError('Failed to add basic identity.'));
+    }
+
+    return response(res, 201, 'Basic identity successfully added', {
+      id: userBasicIdentity.id,
     });
-
-  if (!userBasicIdentity) {
-    return next(new InvariantError('Gagal menambahkan basic identity.'));
+  } catch (error) {
+    next(error);
   }
-
-  return response(res, 201, 'Basic identity berhasil ditambahkan', {
-    id: userBasicIdentity.id,
-  });
 };
 
 export const getUserBasicIdentityByUserId = async (req, res, next) => {
-  const { user_id } = req.params;
+  try {
+    // 1. Ambil ID langsung dari Token rahasia, BUKAN dari URL params
+    const userId = req.user.id;
 
-  const userBasicIdentity =
-    await BasicIdentityRepositories.getUserBasicIdentityByUserId(user_id);
+    const userBasicIdentity =
+      await BasicIdentityRepository.getUserBasicIdentityByUserId(userId);
 
-  if (!userBasicIdentity) {
-    return next(new NotFoundError('Basic identity tidak ditemukan.'));
+    if (!userBasicIdentity) {
+      return next(new NotFoundError('Basic identity not found.'));
+    }
+
+    return response(res, 200, 'Basic identity successfully retrieved', {
+      userBasicIdentity,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  return response(res, 200, 'Basic identity berhasil ditampilkan', {
-    userBasicIdentity,
-  });
 };
 
 export const editUserBasicIdentityByUserId = async (req, res, next) => {
-  const { age, gender, weight, height, activity_level } = req.validated;
-  const { user_id } = req.params;
+  try {
+    // 1. Ambil ID dari Token
+    const userId = req.user.id;
 
-  const isUserBasicIdentityExist =
-    await BasicIdentityRepositories.getUserBasicIdentityByUserId(user_id);
-
-  if (!isUserBasicIdentityExist) {
-    return next(new NotFoundError('Basic identity tidak ditemukan.'));
-  }
-
-  const userBasicIdentity =
-    await BasicIdentityRepositories.editUserBasicIdentityByUserId(user_id, {
+    // 2. Ambil data dari body
+    const {
       age,
       gender,
       weight,
       height,
-      activity_level,
+      activity_level: activityLevel,
+    } = req.validated;
+
+    const isUserBasicIdentityExist =
+      await BasicIdentityRepository.getUserBasicIdentityByUserId(userId);
+
+    if (!isUserBasicIdentityExist) {
+      return next(new NotFoundError('Basic identity not found.'));
+    }
+
+    const userBasicIdentity =
+      await BasicIdentityRepository.editUserBasicIdentityByUserId(userId, {
+        age,
+        gender,
+        weight,
+        height,
+        activityLevel,
+      });
+
+    if (!userBasicIdentity) {
+      return next(new InvariantError('Failed to update basic identity.'));
+    }
+
+    return response(res, 200, 'Basic identity successfully updated', {
+      userBasicIdentity,
     });
-
-  if (!userBasicIdentity) {
-    return next(new InvariantError('Gagal mengubah basic identity.'));
+  } catch (error) {
+    next(error);
   }
-
-  return response(res, 200, 'Basic identity berhasil diubah', {
-    userBasicIdentity,
-  });
 };

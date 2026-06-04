@@ -1,61 +1,46 @@
 import { Pool } from 'pg';
 import { nanoid } from 'nanoid';
 
-class BasicIdentityRepositories {
+class BasicIdentityRepository {
   constructor() {
     this.pool = new Pool();
   }
 
   async addUserBasicIdentity({
-    user_id,
+    userId,
     age,
     gender,
     weight,
     height,
-    activity_level,
+    activityLevel,
   }) {
-    const id = nanoid(16);
-
-    const createdAt = new Date().toISOString();
-    const updatedAt = new Date().toISOString();
+    const id = `bid-${nanoid(16)}`;
 
     const query = {
       text: `
-        INSERT INTO basic_identity(
+        INSERT INTO basic_identities (
           id,
           user_id,
           age,
           gender,
           weight,
           height,
-          activity_level,
-          created_at,
-          updated_at
+          activity_level
         )
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id
       `,
-      values: [
-        id,
-        user_id,
-        age,
-        gender,
-        weight,
-        height,
-        activity_level,
-        createdAt,
-        updatedAt,
-      ],
+      values: [id, userId, age, gender, weight, height, activityLevel],
     };
 
     const result = await this.pool.query(query);
     return result.rows[0];
   }
 
-  async getUserBasicIdentityByUserId(user_id) {
+  async getUserBasicIdentityByUserId(userId) {
     const query = {
-      text: 'SELECT * FROM basic_identity WHERE user_id = $1',
-      values: [user_id],
+      text: 'SELECT * FROM basic_identities WHERE user_id = $1',
+      values: [userId],
     };
 
     const result = await this.pool.query(query);
@@ -63,25 +48,23 @@ class BasicIdentityRepositories {
   }
 
   async editUserBasicIdentityByUserId(
-    user_id,
-    { age, gender, weight, height, activity_level },
+    userId,
+    { age, gender, weight, height, activityLevel },
   ) {
-    const updatedAt = new Date().toISOString();
-
     const query = {
       text: `
-          UPDATE basic_identity
-          SET
-            age = $1,
-            gender = $2,
-            weight = $3,
-            height = $4,
-            activity_level = $5,
-            updated_at = $6
-          WHERE user_id = $7
-          RETURNING *
-        `,
-      values: [age, gender, weight, height, activity_level, updatedAt, user_id],
+        UPDATE basic_identities
+        SET
+          age = $1,
+          gender = $2,
+          weight = $3,
+          height = $4,
+          activity_level = $5,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = $6
+        RETURNING *
+      `,
+      values: [age, gender, weight, height, activityLevel, userId],
     };
 
     const result = await this.pool.query(query);
@@ -89,4 +72,4 @@ class BasicIdentityRepositories {
   }
 }
 
-export default BasicIdentityRepositories;
+export default new BasicIdentityRepository();

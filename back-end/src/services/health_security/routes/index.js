@@ -1,27 +1,27 @@
 import { Router } from 'express';
-import authenticateToken from '../../../middlewares/auth.js';
+import authenticateToken from '../../../middleware/auth.js';
+import { validate } from '../../../middleware/validate.js';
+import {
+  createHealthSecuritySchema,
+  updateHealthSecuritySchema,
+} from '../validator/schema.js';
 import {
   addHealthSecurity,
   getHealthSecurityByUserId,
   editHealthSecurityByUserId,
 } from '../controller/health_security-controller.js';
-import validate from '../../../middlewares/validate.js';
-import {
-  addHealthSecuritySchema,
-  updateHealthSecuritySchema,
-} from '../validator/schema.js';
 
 const router = Router();
 
 router.post(
-  '/:user_id',
+  '/',
   authenticateToken,
-  validate(addHealthSecuritySchema),
+  validate(createHealthSecuritySchema),
   addHealthSecurity,
 );
-router.get('/:user_id', authenticateToken, getHealthSecurityByUserId);
+router.get('/', authenticateToken, getHealthSecurityByUserId);
 router.put(
-  '/:user_id',
+  '/',
   authenticateToken,
   validate(updateHealthSecuritySchema),
   editHealthSecurityByUserId,

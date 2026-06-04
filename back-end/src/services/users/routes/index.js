@@ -1,25 +1,30 @@
-import {
-  addNewUser,
-  getUserById,
-  addUserBasicIdentity,
-} from '../controller/user-controller.js';
 import { Router } from 'express';
 import { validate } from '../../../middleware/validate.js';
 import {
   UserPayloadSchema,
-  UserBasicIdentitySchema,
-} from '../validator/schema.js';
-import authenticateToken from '../.././../middleware/auth.js';
+  updateUserPayloadSchema,
+} from '../validator/schema.js'; // Import schema update
+import authenticateToken from '../../../middleware/auth.js';
+import {
+  addNewUser,
+  getUserById,
+  updateUserById,
+  updateOnboardingStatus,
+} from '../controller/user-controller.js'; // Import controller update
 
 const router = Router();
 
-router.post('/users', validate(UserPayloadSchema), addNewUser);
-router.get('/users/:id', getUserById);
-router.post(
-  '/users/basic_identity',
+// Base route is /api/v1/users
+router.post('/', validate(UserPayloadSchema), addNewUser);
+router.get('/', authenticateToken, getUserById);
+
+// TAMBAHKAN ROUTE INI
+router.put('/onboarding-status', authenticateToken, updateOnboardingStatus);
+router.put(
+  '/',
   authenticateToken,
-  validate(UserBasicIdentitySchema),
-  addUserBasicIdentity,
+  validate(updateUserPayloadSchema),
+  updateUserById,
 );
 
 export default router;

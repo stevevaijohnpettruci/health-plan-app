@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { nanoid } from 'nanoid';
 
-class GoalSettingRepositories {
+class GoalSettingRepository {
   constructor() {
     this.pool = new Pool();
   }
@@ -14,24 +14,19 @@ class GoalSettingRepositories {
     preferredActivity,
   }) {
     const id = `goal-${nanoid(16)}`;
-    const createdAt = new Date();
-    const updatedAt = createdAt;
 
     const query = {
       text: `
-        INSERT INTO goals_setting (
+        INSERT INTO goal_settings (
           id,
           user_id,
           primary_goal,
           target_weight_kg,
           commitment_days,
-          preferred_activity,
-          created_at,
-          updated_at
+          preferred_activity
         )
         VALUES (
-          $1, $2, $3, $4,
-          $5, $6, $7, $8
+          $1, $2, $3, $4, $5, $6
         )
         RETURNING id
       `,
@@ -42,13 +37,10 @@ class GoalSettingRepositories {
         targetWeightKg,
         commitmentDays,
         preferredActivity,
-        createdAt,
-        updatedAt,
       ],
     };
 
     const result = await this.pool.query(query);
-
     return result.rows[0].id;
   }
 
@@ -64,15 +56,15 @@ class GoalSettingRepositories {
           preferred_activity,
           created_at,
           updated_at
-        FROM goals_setting
+        FROM goal_settings
         WHERE user_id = $1
       `,
       values: [userId],
     };
 
     const result = await this.pool.query(query);
-
-    return result.rows;
+    // Mengembalikan rows[0] karena biasanya 1 user = 1 setting goals
+    return result.rows[0];
   }
 
   async getGoalSettingById(id) {
@@ -87,14 +79,13 @@ class GoalSettingRepositories {
           preferred_activity,
           created_at,
           updated_at
-        FROM goals_setting
+        FROM goal_settings
         WHERE id = $1
       `,
       values: [id],
     };
 
     const result = await this.pool.query(query);
-
     return result.rows[0];
   }
 
@@ -102,18 +93,16 @@ class GoalSettingRepositories {
     id,
     { primaryGoal, targetWeightKg, commitmentDays, preferredActivity },
   ) {
-    const updatedAt = new Date();
-
     const query = {
       text: `
-        UPDATE goals_setting
+        UPDATE goal_settings
         SET
           primary_goal = $1,
           target_weight_kg = $2,
           commitment_days = $3,
           preferred_activity = $4,
-          updated_at = $5
-        WHERE id = $6
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
         RETURNING id
       `,
       values: [
@@ -121,15 +110,13 @@ class GoalSettingRepositories {
         targetWeightKg,
         commitmentDays,
         preferredActivity,
-        updatedAt,
         id,
       ],
     };
 
     const result = await this.pool.query(query);
-
     return result.rows[0];
   }
 }
 
-export default GoalSettingRepositories;
+export default new GoalSettingRepository();
